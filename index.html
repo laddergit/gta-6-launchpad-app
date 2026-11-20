@@ -1,0 +1,1820 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>GTA 6 Launchpad — App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root{
+        --bg:#ffffff; --surface:#ffffff; --surface-2:#f7f7f9; --surface-3:#efeff2;
+        --border:#e7e7ec; --border-strong:#d9d9e0;
+        --text:#0d0d10; --muted:#71717c; --faint:#a1a1ab;
+        --green:#15a34a; --green-bg:#e7f7ee; --red:#e5484d; --red-bg:#fdecec;
+        --grad:linear-gradient(92deg,#7c3aed 0%,#4f46e5 55%,#2563eb 100%);
+        --shadow:0 1px 2px rgba(16,16,24,.05),0 8px 24px -12px rgba(16,16,24,.12);
+        --shadow-lg:0 2px 4px rgba(16,16,24,.06),0 20px 44px -16px rgba(16,16,24,.18);
+        --radius:14px;
+        color-scheme:light;
+      }
+      html[data-theme="dark"]{
+        --bg:#0a0a0e; --surface:#131318; --surface-2:#17171e; --surface-3:#1e1e27;
+        --border:#26262f; --border-strong:#34343f;
+        --text:#f4f4f6; --muted:#9d9daa; --faint:#6d6d7b;
+        --green:#2fbf71; --green-bg:#0f2c1e; --red:#f26d6d; --red-bg:#33161a;
+        --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.5);
+        --shadow-lg:0 2px 4px rgba(0,0,0,.5),0 20px 44px -16px rgba(0,0,0,.6);
+        color-scheme:dark;
+      }
+      *{box-sizing:border-box}
+      html{scroll-behavior:smooth}
+      body{margin:0;background:var(--bg);color:var(--text);font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+      .serif{font-family:"Newsreader",Georgia,"Times New Roman",serif}
+      .num{font-variant-numeric:tabular-nums}
+      a{color:inherit;text-decoration:none}
+      button{font-family:inherit;cursor:pointer}
+      button,[role="button"],select,input,textarea{font-family:inherit}
+      button,select,input:not([type="file"]),textarea{ min-height:2.25rem; }
+      :focus-visible{outline:2px solid #4f46e5;outline-offset:2px;border-radius:6px}
+      .wrap{max-width:1280px;margin:0 auto;padding:0 20px}
+
+      /* ---------- Header ---------- */
+      header.site{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+      .header-in{display:flex;align-items:center;gap:14px;height:64px}
+      .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.01em;white-space:nowrap}
+      .brand img{width:38px;height:38px;border-radius:10px;object-fit:cover;box-shadow:var(--shadow)}
+      .brand .brand-sub{display:block;font-size:10.5px;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+      nav.main{display:flex;gap:4px;margin-left:8px}
+      nav.main button{background:none;border:0;color:var(--muted);font-weight:600;font-size:14.5px;padding:8px 12px;border-radius:9px;min-height:2.25rem}
+      nav.main button:hover{color:var(--text);background:var(--surface-2)}
+      nav.main button.active{color:var(--text);background:var(--surface-3)}
+      .header-spacer{flex:1}
+      .search-box{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:0 12px;height:38px;width:230px}
+      .search-box svg{flex:none;color:var(--faint)}
+      .search-box input{border:0;background:none;outline:none;color:var(--text);font-size:14px;width:100%;min-height:0;height:100%}
+      .search-box input::placeholder{color:var(--faint)}
+      .icon-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text)}
+      .icon-btn:hover{background:var(--surface-2)}
+      .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;font-weight:700;font-size:14.5px;padding:0 18px;height:40px;border:1px solid transparent;white-space:nowrap;transition:transform .08s ease,opacity .15s ease}
+      .btn:active{transform:scale(.98)}
+      .btn-grad{background:var(--grad);color:#fff;box-shadow:0 6px 18px -8px rgba(99,60,235,.55)}
+      .btn-grad:hover{opacity:.93}
+      .btn-black{background:#0d0d10;color:#fff;border-color:#0d0d10}
+      html[data-theme="dark"] .btn-black{background:#f4f4f6;color:#0d0d10;border-color:#f4f4f6}
+      .btn-black:hover{opacity:.88}
+      .btn-ghost{background:var(--surface);border-color:var(--border);color:var(--text)}
+      .btn-ghost:hover{background:var(--surface-2)}
+      .btn[disabled]{opacity:.55;cursor:not-allowed}
+      .wallet-pop{position:absolute;top:52px;right:0;width:280px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:14px;z-index:70}
+      .wallet-anchor{position:relative}
+
+      /* ---------- Ticker ---------- */
+      .ticker{border-bottom:1px solid var(--border);background:var(--surface);overflow:hidden;height:38px;display:flex;align-items:center}
+      .ticker-track{display:flex;gap:0;white-space:nowrap;animation:tick 46s linear infinite;will-change:transform}
+      .ticker:hover .ticker-track{animation-play-state:paused}
+      @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+      .tick-item{display:inline-flex;align-items:center;gap:7px;padding:0 18px;font-size:12.5px;font-weight:600;color:var(--muted)}
+      .tick-item b{color:var(--text);font-weight:700}
+      .tick-item .dot{width:3px;height:3px;border-radius:50%;background:var(--border-strong)}
+      .up{color:var(--green)} .down{color:var(--red)}
+
+      /* ---------- Page scaffolding ---------- */
+      main{padding:30px 0 70px}
+      .page-title{font-size:clamp(40px,6vw,58px);font-weight:600;letter-spacing:-.01em;margin:6px 0 4px;line-height:1.05}
+      .page-sub{color:var(--muted);font-size:15.5px;margin:0 0 26px;max-width:640px}
+      .view{display:none}
+      .view.active{display:block}
+
+      /* ---------- Stats ---------- */
+      .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:22px 0 26px}
+      .stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)}
+      .stat .lbl{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+      .stat .val{font-size:23px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+      .stat .sub{font-size:12px;color:var(--faint);margin-top:3px;font-weight:600}
+
+      /* ---------- Tabs & controls ---------- */
+      .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+      .tab{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:0 16px;height:38px;font-weight:600;font-size:14px}
+      .tab:hover{background:var(--surface-2)}
+      .tab.active{background:#0d0d10;color:#fff;border-color:#0d0d10}
+      html[data-theme="dark"] .tab.active{background:#f4f4f6;color:#0d0d10;border-color:#f4f4f6}
+      .controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+      .controls .spacer{flex:1}
+      .ctl-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+      select.ctl,input.ctl{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0 12px;height:38px;font-size:14px;font-weight:600;color:var(--text)}
+      .seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px}
+      .seg button{border:0;background:none;border-radius:8px;padding:0 12px;height:32px;font-weight:600;font-size:13.5px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+      .seg button.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+
+      /* ---------- Token table ---------- */
+      .table-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+      table.tokens{width:100%;border-collapse:collapse;font-size:13.5px}
+      table.tokens th{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);text-align:right;padding:12px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+      table.tokens th:first-child,table.tokens td:first-child{text-align:left;padding-left:16px}
+      table.tokens th:nth-child(2),table.tokens td:nth-child(2){text-align:left}
+      table.tokens td{padding:13px 10px;border-bottom:1px solid var(--border);text-align:right;vertical-align:middle;white-space:nowrap}
+      table.tokens tbody tr{cursor:pointer}
+      table.tokens tbody tr:hover{background:var(--surface-2)}
+      table.tokens tbody tr:last-child td{border-bottom:0}
+      .tok-cell{display:flex;align-items:center;gap:11px;text-align:left}
+      .tok-img{width:42px;height:42px;border-radius:11px;object-fit:cover;flex:none;background:var(--surface-3)}
+      .tok-name{font-weight:700;font-size:14.5px;line-height:1.2}
+      .tok-sym{color:var(--muted);font-size:12.5px;font-weight:600}
+      .badge{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;letter-spacing:.03em;padding:2.5px 8px;border-radius:999px;background:var(--surface-3);color:var(--muted);vertical-align:middle}
+      .badge.live{background:var(--green-bg);color:var(--green)}
+      .badge.stock{background:#eef2ff;color:#4338ca}
+      html[data-theme="dark"] .badge.stock{background:#1d2440;color:#a5b4fc}
+      .watch-btn{background:none;border:0;color:var(--faint);width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px}
+      .watch-btn:hover{background:var(--surface-3);color:var(--text)}
+      .watch-btn.on{color:#eab308}
+      .dash{color:var(--faint)}
+
+      /* ---------- Grid cards ---------- */
+      .grid-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+      .coin-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;cursor:pointer}
+      .coin-card:hover{box-shadow:var(--shadow-lg)}
+      .coin-card .cc-head{display:flex;gap:12px;align-items:flex-start}
+      .coin-card .cc-head img{width:52px;height:52px;border-radius:13px;object-fit:cover;background:var(--surface-3)}
+      .coin-card .cc-name{font-weight:800;font-size:16.5px;line-height:1.2}
+      .coin-card .cc-meta{color:var(--muted);font-size:12.5px;font-weight:600}
+      .coin-card .cc-spark{margin:12px 0 6px}
+      .cc-nums{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;border-top:1px solid var(--border);padding-top:12px;margin-top:8px}
+      .cc-nums .lbl{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+      .cc-nums .v{font-size:16px;font-weight:800}
+      .cc-nums .v.small{font-size:14px;font-weight:700}
+
+      /* ---------- Empty state ---------- */
+      .empty{margin-top:16px;border:1.5px dashed var(--border-strong);border-radius:var(--radius);padding:38px 24px;text-align:center;background:var(--surface)}
+      .empty h3{margin:0 0 6px;font-size:20px;font-weight:700}
+      .empty p{color:var(--muted);margin:0 auto 18px;max-width:440px}
+
+      /* ---------- Token detail ---------- */
+      .back-btn{background:none;border:0;color:var(--muted);font-weight:600;font-size:14px;display:inline-flex;gap:6px;align-items:center;padding:8px 4px;min-height:2.25rem}
+      .back-btn:hover{color:var(--text)}
+      .detail-head{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;margin-top:6px}
+      .detail-head img.big{width:84px;height:84px;border-radius:20px;object-fit:cover;box-shadow:var(--shadow);background:var(--surface-3)}
+      .detail-head h1{font-size:32px;font-weight:800;letter-spacing:-.02em;margin:0;line-height:1.1}
+      .detail-head .sym{color:var(--muted);font-weight:700;font-size:19px}
+      .ca-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
+      .ca-chip{display:inline-flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:5px 6px 5px 11px;font-size:12.5px;font-weight:600;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+      .ca-chip button{border:0;background:var(--surface);border-radius:7px;width:28px;height:28px;min-height:0;display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
+      .ca-chip button:hover{color:var(--text)}
+      .head-actions{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+      .price-line{display:flex;align-items:baseline;gap:12px;margin-top:14px;flex-wrap:wrap}
+      .price-big{font-size:34px;font-weight:800;letter-spacing:-.02em}
+      .chg-chip{font-weight:700;font-size:13.5px;padding:4px 10px;border-radius:999px}
+      .chg-chip.up{background:var(--green-bg);color:var(--green)}
+      .chg-chip.down{background:var(--red-bg);color:var(--red)}
+      .detail-stats{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;margin:20px 0}
+      .detail-grid{display:grid;grid-template-columns:minmax(0,1fr) 372px;gap:16px;align-items:start}
+      .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+      .card h3{margin:0 0 12px;font-size:16px;font-weight:800;letter-spacing:-.01em}
+      .chart-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+      .tf-seg button{height:30px;padding:0 10px;font-size:12.5px}
+      .chart-box{width:100%}
+      .chart-box svg{display:block;width:100%;height:auto}
+      .axis-lbl{font-size:10.5px;fill:var(--faint);font-weight:600}
+      .risk-list{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+      .risk-list li{display:flex;gap:10px;font-size:14px;color:var(--text)}
+      .risk-list li svg{flex:none;margin-top:1px}
+      .risk-list li span{color:var(--muted)}
+      .tech-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 22px;font-size:13.5px}
+      .tech-grid .k{color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+      .tech-grid .v{font-weight:600;word-break:break-all}
+      .tech-grid .v a{color:#4f46e5;font-weight:700}
+      html[data-theme="dark"] .tech-grid .v a{color:#a5b4fc}
+
+      /* ---------- Buy / sell panel ---------- */
+      .trade-panel{position:sticky;top:118px}
+      .bs-tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:4px;gap:4px;margin-bottom:14px}
+      .bs-tabs button{border:0;border-radius:9px;height:40px;font-weight:800;font-size:15px;background:none;color:var(--muted)}
+      .bs-tabs button.active.buy{background:var(--green);color:#fff}
+      .bs-tabs button.active.sell{background:var(--red);color:#fff}
+      .amt-box{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+      .amt-box .row{display:flex;align-items:center;gap:10px}
+      .amt-box input{flex:1;border:0;background:none;outline:none;font-size:24px;font-weight:800;color:var(--text);min-width:0;height:38px}
+      .amt-box .unit{font-weight:800;font-size:15px;color:var(--muted)}
+      .amt-box .usd{font-size:12.5px;color:var(--faint);font-weight:600;margin-top:2px}
+      .bal-row{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--muted);font-weight:600;margin:10px 2px 0}
+      .pct-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+      .pct-row button{border:1px solid var(--border);background:var(--surface);border-radius:9px;height:34px;font-weight:700;font-size:13px;color:var(--text)}
+      .pct-row button:hover{background:var(--surface-2)}
+      .recv-box{display:flex;justify-content:space-between;align-items:center;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:12px;font-size:14px}
+      .recv-box .k{color:var(--muted);font-weight:600}
+      .recv-box .v{font-weight:800;text-align:right}
+      .recv-box .v small{display:block;color:var(--faint);font-weight:600;font-size:12px}
+      .quote-meta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);font-weight:600;padding:10px 2px 0}
+      .action-btn{width:100%;height:50px;border-radius:13px;border:0;font-size:16.5px;font-weight:800;color:#fff;margin-top:14px}
+      .action-btn.buy{background:var(--green)} .action-btn.sell{background:var(--red)}
+      .action-btn.connect{background:#0d0d10}
+      html[data-theme="dark"] .action-btn.connect{background:#f4f4f6;color:#0d0d10}
+      .action-btn:hover{opacity:.92}
+      .panel-sec{margin-top:18px;border-top:1px solid var(--border);padding-top:14px}
+      .panel-sec .sec-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+      .chip-row{display:flex;flex-wrap:wrap;gap:7px}
+      .chip{border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:0 12px;height:32px;font-weight:700;font-size:13px;color:var(--text)}
+      .chip:hover{background:var(--surface-2)}
+      .chip.active{background:#0d0d10;color:#fff;border-color:#0d0d10}
+      html[data-theme="dark"] .chip.active{background:#f4f4f6;color:#0d0d10;border-color:#f4f4f6}
+      .note-line{font-size:12.5px;color:var(--muted);margin-top:12px;line-height:1.5}
+
+      /* ---------- Create ---------- */
+      .create-grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;align-items:start}
+      .field{margin-bottom:18px}
+      .field label{display:block;font-weight:700;font-size:14px;margin-bottom:7px}
+      .field .hint{font-size:12.5px;color:var(--muted);margin-top:6px}
+      .field input[type="text"],.field textarea,.field select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:10px 13px;font-size:15px;color:var(--text);outline:none}
+      .field textarea{resize:vertical;min-height:88px}
+      .field input:focus,.field textarea:focus,.field select:focus{border-color:#4f46e5;box-shadow:0 0 0 3px rgba(79,70,229,.15)}
+      .field .err{color:var(--red);font-size:12.5px;font-weight:600;margin-top:6px;display:none}
+      .field.invalid input,.field.invalid textarea{border-color:var(--red)}
+      .field.invalid .err{display:block}
+      .upload-box{display:flex;gap:14px;align-items:center}
+      .upload-preview{width:76px;height:76px;border-radius:16px;background:var(--surface-2);border:1.5px dashed var(--border-strong);display:flex;align-items:center;justify-content:center;color:var(--faint);overflow:hidden;flex:none}
+      .upload-preview img{width:100%;height:100%;object-fit:cover}
+      .pair-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
+      .pair-opt{border:1.5px solid var(--border);background:var(--surface);border-radius:12px;padding:11px 12px;text-align:left;min-height:58px}
+      .pair-opt:hover{border-color:var(--border-strong)}
+      .pair-opt.active{border-color:#4f46e5;background:color-mix(in srgb,#4f46e5 6%,var(--surface))}
+      .pair-opt .ps{font-weight:800;font-size:15px;display:flex;align-items:center;gap:7px}
+      .pair-opt .pn{color:var(--muted);font-size:12px;font-weight:600}
+      .pair-group-lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px}
+      .summary-card{position:sticky;top:118px}
+      .sum-row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px}
+      .sum-row:last-of-type{border-bottom:0}
+      .sum-row .k{color:var(--muted);font-weight:600}
+      .sum-row .v{font-weight:700;text-align:right;word-break:break-all}
+      .sum-row .v.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+      .deploy-btn{width:100%;height:50px;margin-top:14px;font-size:16px}
+
+      /* ---------- Create wizard ---------- */
+      .steps{list-style:none;display:flex;gap:4px;margin:0 0 22px;padding:0 0 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+      .steps li{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:999px;cursor:pointer;font-weight:700;font-size:13px;color:var(--muted)}
+      .steps li:hover{background:var(--surface-2)}
+      .steps li .n{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border-strong);display:inline-flex;align-items:center;justify-content:center;font-size:12.5px;flex:none;background:var(--surface);color:var(--muted)}
+      .steps li.active{color:var(--text)}
+      .steps li.active .n{background:#0d0d10;color:#fff;border-color:#0d0d10}
+      html[data-theme="dark"] .steps li.active .n{background:#f4f4f6;color:#0d0d10;border-color:#f4f4f6}
+      .steps li.done{color:var(--text)}
+      .steps li.done .n{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+      .step-pane{display:none}
+      .step-pane.active{display:block}
+      .wiz-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:22px;padding-top:18px;border-top:1px solid var(--border)}
+      .wiz-count{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;text-align:center}
+      .fee-big{font-size:44px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+      input[type="range"]{width:100%;accent-color:#4f46e5;height:36px;cursor:pointer;padding:0}
+      .fee-scale{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--faint);margin-top:-2px}
+      .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+      .type-opt{border:1.5px solid var(--border);background:var(--surface);border-radius:12px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:5px;color:var(--text)}
+      .type-opt:hover{border-color:var(--border-strong)}
+      .type-opt.active{border-color:#4f46e5;background:color-mix(in srgb,#4f46e5 6%,var(--surface))}
+      .type-opt .t-name{font-weight:800;font-size:15.5px}
+      .type-opt .t-desc{color:var(--muted);font-size:13px;line-height:1.45;font-weight:500}
+      .type-opt .t-split{font-size:12px;font-weight:800;color:#4f46e5;margin-top:2px}
+      html[data-theme="dark"] .type-opt .t-split{color:#a5b4fc}
+      .split-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+      .split-lbl{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px}
+      .split-in,.po-share{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0 11px}
+      .split-in input,.po-share input{border:0;background:none;outline:none;width:100%;font-size:15px;font-weight:700;color:var(--text);height:40px;min-height:0}
+      .split-in span,.po-share span{font-weight:700;color:var(--muted)}
+      .payout-row{display:grid;grid-template-columns:minmax(0,1fr) 104px 38px;gap:9px;margin-bottom:9px}
+      .payout-row .po-addr{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0 12px;font-size:13px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--text);outline:none;height:42px}
+      .payout-row .po-addr:focus{border-color:#4f46e5;box-shadow:0 0 0 3px rgba(79,70,229,.15)}
+      .po-del{border:1px solid var(--border);background:var(--surface);border-radius:10px;color:var(--muted);font-size:18px;line-height:1;min-height:0;height:42px}
+      .po-del:hover{color:var(--red);border-color:var(--red)}
+      .initbuy-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:0 14px}
+      .initbuy-row input{flex:1;border:0;background:none;outline:none;font-size:19px;font-weight:800;color:var(--text);height:48px;min-width:0}
+      .initbuy-row .unit{font-weight:800;color:var(--muted)}
+      .review-head{display:flex;gap:13px;align-items:center;margin-bottom:8px}
+      .review-head img{width:52px;height:52px;border-radius:13px;object-fit:cover;background:var(--surface-3)}
+
+      /* ---------- Modal & toast ---------- */
+      .modal-back{position:fixed;inset:0;background:rgba(10,10,16,.5);backdrop-filter:blur(3px);z-index:90;display:none;align-items:center;justify-content:center;padding:18px}
+      .modal-back.open{display:flex}
+      .modal{background:var(--surface);border-radius:18px;box-shadow:var(--shadow-lg);max-width:400px;width:100%;padding:22px}
+      .modal h3{margin:0 0 4px;font-size:19px;font-weight:800}
+      .modal p{color:var(--muted);font-size:14px;margin:0 0 16px}
+      .wallet-opt{display:flex;align-items:center;gap:12px;width:100%;border:1px solid var(--border);background:var(--surface);border-radius:12px;padding:12px 14px;font-weight:700;font-size:15px;color:var(--text);margin-bottom:9px;min-height:52px;text-align:left}
+      .wallet-opt:hover{background:var(--surface-2)}
+      .wallet-opt .st{margin-left:auto;font-size:12px;font-weight:700;color:var(--muted)}
+      .wallet-opt .st.ok{color:var(--green)}
+      .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:#0d0d10;color:#fff;font-weight:600;font-size:14px;padding:12px 18px;border-radius:12px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:all .25s ease;z-index:120;max-width:min(92vw,480px);text-align:center}
+      html[data-theme="dark"] .toast{background:#f4f4f6;color:#0d0d10}
+      .toast.show{opacity:1;transform:translate(-50%,0)}
+
+      footer.site{border-top:1px solid var(--border);padding:26px 0 40px;margin-top:10px}
+      .foot-in{display:flex;gap:16px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:13.5px;font-weight:600}
+      .foot-in .spacer{flex:1}
+      .foot-in a:hover{color:var(--text)}
+      .spin{width:16px;height:16px;border:2px solid var(--border-strong);border-top-color:var(--muted);border-radius:50%;animation:sp 0.7s linear infinite;display:inline-block;vertical-align:-3px}
+      @keyframes sp{to{transform:rotate(360deg)}}
+      .skel{color:var(--faint)}
+
+      /* ---------- Responsive ---------- */
+      @media (max-width:1180px){
+        .stats{grid-template-columns:repeat(3,1fr)}
+        .detail-stats{grid-template-columns:repeat(4,1fr)}
+      }
+      @media (max-width:1020px){
+        .detail-grid,.create-grid{grid-template-columns:1fr}
+        .trade-panel,.summary-card{position:static}
+        .search-box{display:none}
+      }
+      @media (max-width:1080px){
+        .table-card{display:none}
+        #gridWrap{display:block!important}
+        #viewToggleWrap{display:none}
+      }
+      @media (max-width:680px){
+        .steps li .t{display:none}
+        .steps li.active .t{display:inline}
+        .steps li{padding-right:6px}
+        .steps li.active{padding-right:12px}
+        .type-grid{grid-template-columns:1fr}
+        .split-grid{grid-template-columns:1fr}
+        .payout-row{grid-template-columns:minmax(0,1fr) 88px 36px}
+        .wrap{padding:0 14px}
+        .stats{grid-template-columns:repeat(2,1fr)}
+        .detail-stats{grid-template-columns:repeat(2,1fr)}
+        .brand .brand-txt{display:none}
+        .header-launch{display:none}
+        nav.main{margin-left:0}
+        nav.main button{padding:8px 9px;font-size:13.5px}
+        .btn{padding:0 13px;font-size:13.5px;height:38px}
+        .header-in{gap:9px}
+        .detail-head h1{font-size:26px}
+        .price-big{font-size:27px}
+        .tech-grid{grid-template-columns:1fr}
+        main{padding-top:20px}
+      }
+      @media (prefers-reduced-motion:reduce){
+        .ticker-track{animation:none}
+        html{scroll-behavior:auto}
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ================= HEADER ================= -->
+    <header class="site">
+      <div class="wrap header-in">
+        <a class="brand" href="#" data-nav="explore" aria-label="GTA 6 Launchpad home">
+          <img src="assets/logo-rocket.webp" alt="GTA 6 Launchpad rocket emblem" />
+          <span class="brand-txt">GTA 6 Launchpad<span class="brand-sub">Solana · Mainnet</span></span>
+        </a>
+        <nav class="main" aria-label="Main">
+          <button type="button" data-nav="explore" class="active" id="navExplore">Explore</button>
+          <button type="button" data-nav="create" id="navCreate">Create</button>
+        </nav>
+        <div class="header-spacer"></div>
+        <label class="search-box">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
+          <input type="search" id="searchInput" placeholder="Search tokens…" aria-label="Search tokens" />
+        </label>
+        <button type="button" class="icon-btn" id="themeToggle" aria-label="Toggle dark mode">
+          <svg id="themeIconMoon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+          <svg id="themeIconSun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+        <button type="button" class="btn btn-grad header-launch" data-nav="create">Launch a coin</button>
+        <span class="wallet-anchor">
+          <button type="button" class="btn btn-black" id="walletBtn">Connect wallet</button>
+          <span class="wallet-pop" id="walletPop" style="display:none">
+            <div style="font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Connected wallet</div>
+            <div class="num" id="walletPopAddr" style="font-weight:700;font-size:14px;word-break:break-all"></div>
+            <div style="display:flex;gap:8px;margin-top:12px">
+              <button type="button" class="btn btn-ghost" id="walletCopyBtn" style="flex:1;height:38px;font-size:13.5px">Copy address</button>
+              <button type="button" class="btn btn-ghost" id="walletDisconnectBtn" style="flex:1;height:38px;font-size:13.5px;color:var(--red)">Disconnect</button>
+            </div>
+          </span>
+        </span>
+      </div>
+    </header>
+
+    <!-- ================= TICKER ================= -->
+    <div class="ticker" aria-label="Live market ticker">
+      <div class="ticker-track" id="tickerTrack">
+        <span class="tick-item"><span class="spin"></span> Loading live prices…</span>
+      </div>
+    </div>
+
+    <main class="wrap">
+      <!-- ================= EXPLORE ================= -->
+      <section class="view active" id="view-explore">
+        <h1 class="page-title serif">Explore</h1>
+        <p class="page-sub">Tokens launched in the city — trade memecoins paired with SOL, USDC, or real tokenized stocks on Solana.</p>
+
+        <div class="stats" id="statsRow">
+          <div class="stat"><div class="lbl">24h Volume</div><div class="val num" data-stat="vol"><span class="skel">—</span></div><div class="sub">Across listed tokens</div></div>
+          <div class="stat"><div class="lbl">24h Transactions</div><div class="val num" data-stat="txns"><span class="skel">—</span></div><div class="sub">Buys + sells</div></div>
+          <div class="stat"><div class="lbl">24h New Listings</div><div class="val num" data-stat="new"><span class="skel">—</span></div><div class="sub">Tokens launched</div></div>
+          <div class="stat"><div class="lbl">24h Top Gainer</div><div class="val num" data-stat="gainer"><span class="skel">—</span></div><div class="sub" data-stat="gainerSub">—</div></div>
+          <div class="stat"><div class="lbl">Fees Paid to Creators</div><div class="val num"><span class="skel">—</span></div><div class="sub">Not tracked yet</div></div>
+          <div class="stat"><div class="lbl">24h Buyback</div><div class="val num"><span class="skel">—</span></div><div class="sub">No buyback program yet</div></div>
+        </div>
+
+        <div class="tabs" id="filterTabs" role="tablist" aria-label="Token filters">
+          <button type="button" class="tab active" data-tab="all">All coins</button>
+          <button type="button" class="tab" data-tab="new">New</button>
+          <button type="button" class="tab" data-tab="holders">Pays holders</button>
+          <button type="button" class="tab" data-tab="support">Price support</button>
+          <button type="button" class="tab" data-tab="buyback">Buys back</button>
+          <button type="button" class="tab" data-tab="cto">Community takeover</button>
+        </div>
+
+        <div class="controls">
+          <span class="ctl-label">Sort by</span>
+          <select class="ctl" id="sortSel" aria-label="Sort tokens">
+            <option value="mcap">Market cap</option>
+            <option value="age">Age</option>
+            <option value="trades">Trades</option>
+            <option value="volume">Volume</option>
+            <option value="change">% change</option>
+          </select>
+          <div class="spacer"></div>
+          <span id="viewToggleWrap">
+            <span class="seg" role="group" aria-label="View mode">
+              <button type="button" id="viewTableBtn" class="active" aria-label="Table view">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Table
+              </button>
+              <button type="button" id="viewGridBtn" aria-label="Grid view">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>Grid
+              </button>
+            </span>
+          </span>
+        </div>
+
+        <div class="table-card" id="tableWrap">
+          <table class="tokens" aria-label="Tokens">
+            <thead>
+              <tr>
+                <th>#</th><th>Token</th><th>Age</th><th>Market cap</th><th>24h chg</th><th>24h vol</th>
+                <th>Holders</th><th>Fee</th><th>Pays to</th><th>Price support</th><th>Buys back</th><th>24h trades</th><th>Last 24h</th><th>Watch</th>
+              </tr>
+            </thead>
+            <tbody id="tokenRows"></tbody>
+          </table>
+        </div>
+
+        <div id="gridWrap" style="display:none">
+          <div class="grid-cards" id="tokenGrid"></div>
+        </div>
+
+        <div class="empty" id="exploreEmpty">
+          <h3 id="emptyTitle">No other tokens yet — be the first to launch</h3>
+          <p id="emptyText">GTA 6 Launchpad just opened its doors on Solana. Launch the next coin, pair it with SOL, USDC, or a tokenized stock like NVDAx or TSLAx, and it will trade here.</p>
+          <button type="button" class="btn btn-grad" data-nav="create" style="height:44px;padding:0 22px">Launch a coin</button>
+        </div>
+      </section>
+
+      <!-- ================= TOKEN DETAIL ================= -->
+      <section class="view" id="view-token">
+        <button type="button" class="back-btn" data-nav="explore">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg>
+          Back to Explore
+        </button>
+
+        <div class="detail-head">
+          <img class="big" src="assets/logo-rocket.webp" alt="GTA 6 LAUNCHPAD token image" />
+          <div>
+            <h1>GTA 6 LAUNCHPAD <span class="sym">$GTA6L</span></h1>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">
+              <span class="badge live">● Live on Solana</span>
+              <span class="badge">Pump.fun</span>
+              <span class="badge">Token-2022</span>
+              <span class="badge">Mint authority revoked</span>
+            </div>
+            <div class="ca-row">
+              <span class="ca-chip"><span id="caText">71dBaV…pump</span>
+                <button type="button" id="copyCaBtn" aria-label="Copy contract address">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </span>
+              <a class="icon-btn" href="https://x.com/gta6launch" target="_blank" rel="noopener" aria-label="GTA 6 Launchpad on X" style="width:34px;height:34px">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.3l7.3-8.3L1 2h6.5l4.4 5.9L18.9 2Zm-1.1 18h1.7L7.1 3.9H5.3L17.8 20Z"/></svg>
+              </a>
+              <a class="icon-btn" href="https://gta6launchpad.xyz" target="_blank" rel="noopener" aria-label="GTA 6 Launchpad website" style="width:34px;height:34px">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
+              </a>
+            </div>
+          </div>
+          <div class="head-actions">
+            <button type="button" class="btn btn-ghost watch-btn-lg" id="detailWatchBtn" style="height:40px">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 17l-5.4 2.8 1.1-6.1L3.2 9.4l6.1-.8L12 3Z"/></svg>
+              <span>Watch</span>
+            </button>
+            <button type="button" class="btn btn-ghost" id="addWalletBtn" style="height:40px">Add to wallet</button>
+          </div>
+        </div>
+
+        <div class="price-line">
+          <span class="price-big num" id="dPrice">—</span>
+          <span class="chg-chip num" id="dChg24">24h —</span>
+          <span class="chg-chip num" id="dChg1h" style="background:var(--surface-3);color:var(--muted)">1h —</span>
+          <span class="chg-chip num" id="dChg6h" style="background:var(--surface-3);color:var(--muted)">6h —</span>
+        </div>
+
+        <div class="detail-stats">
+          <div class="stat"><div class="lbl">Market cap</div><div class="val num" id="dMcap">—</div></div>
+          <div class="stat"><div class="lbl">Liquidity</div><div class="val num" id="dLiq">—</div><div class="sub">Pump.fun bonding curve</div></div>
+          <div class="stat"><div class="lbl">24h Volume</div><div class="val num" id="dVol">—</div></div>
+          <div class="stat"><div class="lbl">24h Trades</div><div class="val num" id="dTrades">—</div></div>
+          <div class="stat"><div class="lbl">Holders</div><div class="val num">—</div><div class="sub">Not published by data source</div></div>
+          <div class="stat"><div class="lbl">Age</div><div class="val num" id="dAge">—</div></div>
+          <div class="stat"><div class="lbl">FDV</div><div class="val num" id="dFdv">—</div></div>
+        </div>
+
+        <div class="detail-grid">
+          <div style="display:grid;gap:16px;min-width:0">
+            <div class="card">
+              <div class="chart-head">
+                <h3 style="margin:0">Price chart</h3>
+                <span class="badge">USD · GeckoTerminal</span>
+                <div class="spacer" style="flex:1"></div>
+                <span class="seg tf-seg" id="tfSeg" role="group" aria-label="Chart timeframe">
+                  <button type="button" data-tf="1m">1m</button>
+                  <button type="button" data-tf="5m">5m</button>
+                  <button type="button" data-tf="15m">15m</button>
+                  <button type="button" data-tf="1h" class="active">1h</button>
+                  <button type="button" data-tf="4h">4h</button>
+                  <button type="button" data-tf="1d">1d</button>
+                </span>
+                <span class="seg tf-seg" id="chartTypeSeg" role="group" aria-label="Chart type">
+                  <button type="button" data-ct="candle" class="active">Candle</button>
+                  <button type="button" data-ct="line">Line</button>
+                </span>
+              </div>
+              <div class="chart-box" id="chartBox"><p class="skel" style="padding:30px 0;text-align:center">Loading chart…</p></div>
+            </div>
+
+            <div class="card">
+              <h3>Before you buy</h3>
+              <ul class="risk-list">
+                <li>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                  <div><b>Mint authority is revoked.</b> <span>The 1,000,000,000 GTA6L supply is fixed — no new tokens can ever be minted.</span></div>
+                </li>
+                <li>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4M12 17.5v.5"/></svg>
+                  <div><b>Brand-new, thin market.</b> <span id="riskMcap">This token launched recently and trades on the Pump.fun bonding curve, so price can move fast in both directions and large orders slip.</span></div>
+                </li>
+                <li>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg>
+                  <div><b>Memecoin risk.</b> <span>GTA6L has no guaranteed utility or returns. Only trade what you can afford to lose, and always verify the contract address above before buying anywhere else.</span></div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <h3>Trades</h3>
+              <p class="note-line" style="margin:0">Aggregate activity is live above (24h volume and trade count). A trade-by-trade feed is not part of this preview build.</p>
+            </div>
+
+            <div class="card">
+              <h3>Technical details</h3>
+              <div class="tech-grid">
+                <div><div class="k">Mint address</div><div class="v mono" style="font-family:ui-monospace,Menlo,monospace;font-size:12px">71dBaVmZcGC2ShnnFWHrgFVMsgRe7dRR8icCWjJkpump</div></div>
+                <div><div class="k">Pair / curve address</div><div class="v mono" style="font-family:ui-monospace,Menlo,monospace;font-size:12px" id="techPair">—</div></div>
+                <div><div class="k">Network</div><div class="v">Solana mainnet</div></div>
+                <div><div class="k">Venue</div><div class="v">Pump.fun bonding curve</div></div>
+                <div><div class="k">Token standard</div><div class="v">Token-2022 · 6 decimals</div></div>
+                <div><div class="k">Total supply</div><div class="v">1,000,000,000 GTA6L</div></div>
+                <div><div class="k">Mint authority</div><div class="v">None (revoked)</div></div>
+                <div><div class="k">Explorer</div><div class="v"><a href="https://solscan.io/token/71dBaVmZcGC2ShnnFWHrgFVMsgRe7dRR8icCWjJkpump" target="_blank" rel="noopener">Solscan</a> · <a href="https://dexscreener.com/solana/71dBaVmZcGC2ShnnFWHrgFVMsgRe7dRR8icCWjJkpump" target="_blank" rel="noopener">DEXscreener</a></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Buy / sell -->
+          <div class="card trade-panel" id="tradePanel">
+            <div class="bs-tabs" role="tablist" aria-label="Buy or sell">
+              <button type="button" class="buy active" id="tabBuy">Buy</button>
+              <button type="button" class="sell" id="tabSell">Sell</button>
+            </div>
+            <div class="amt-box">
+              <div class="row">
+                <input type="text" inputmode="decimal" id="amtInput" placeholder="0.0" value="0.1" aria-label="Amount" />
+                <span class="unit" id="amtUnit">SOL</span>
+              </div>
+              <div class="usd num" id="amtUsd">≈ —</div>
+            </div>
+            <div class="bal-row"><span>Balance</span><span class="num" id="balText">Connect wallet to see balance</span></div>
+            <div class="pct-row" id="pctRow">
+              <button type="button" data-pct="25">25%</button>
+              <button type="button" data-pct="50">50%</button>
+              <button type="button" data-pct="75">75%</button>
+              <button type="button" data-pct="100">Max</button>
+            </div>
+            <div class="recv-box">
+              <span class="k">You'll receive</span>
+              <span class="v num"><span id="recvAmt">—</span><small id="recvUnit">GTA6L · live Jupiter quote</small></span>
+            </div>
+            <div class="quote-meta"><span>Price impact</span><span class="num" id="qImpact">—</span></div>
+            <div class="quote-meta"><span>Minimum received</span><span class="num" id="qMin">—</span></div>
+            <div class="quote-meta"><span>Route</span><span id="qRoute">—</span></div>
+            <button type="button" class="action-btn connect" id="actionBtn">Connect wallet to buy</button>
+
+            <div class="panel-sec">
+              <div class="sec-title">Quick buy · SOL</div>
+              <div class="chip-row" id="quickBuyRow">
+                <button type="button" class="chip" data-qb="0.01">0.01</button>
+                <button type="button" class="chip" data-qb="0.1">0.1</button>
+                <button type="button" class="chip" data-qb="0.5">0.5</button>
+                <button type="button" class="chip" data-qb="1">1</button>
+                <button type="button" class="chip" data-qb="5">5</button>
+                <button type="button" class="chip" data-qb="10">10</button>
+                <button type="button" class="chip" data-qb="20">20</button>
+              </div>
+            </div>
+            <div class="panel-sec">
+              <div class="sec-title">Slippage</div>
+              <div class="chip-row" id="slipRow">
+                <button type="button" class="chip" data-slip="50">0.5%</button>
+                <button type="button" class="chip active" data-slip="100">1%</button>
+                <button type="button" class="chip" data-slip="200">2%</button>
+                <button type="button" class="chip" data-slip="500">5%</button>
+              </div>
+            </div>
+            <div class="panel-sec">
+              <div class="sec-title">Recent trades</div>
+              <p class="note-line" style="margin:0">Not shown in this preview build — 24h totals above are live from DEXscreener.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= CREATE ================= -->
+      <section class="view" id="view-create">
+        <h1 class="page-title serif">Launch a coin</h1>
+        <p class="page-sub">Create a token on Solana and pair it with SOL, USDC, or a real tokenized stock. Your pool opens on Raydium CPMM and routes through Jupiter from day one.</p>
+
+        <div class="create-grid">
+          <form class="card" id="createForm" novalidate>
+            <ol class="steps" id="stepBar">
+              <li data-goto="1" class="active"><span class="n">1</span><span class="t">Identity</span></li>
+              <li data-goto="2"><span class="n">2</span><span class="t">Pair</span></li>
+              <li data-goto="3"><span class="n">3</span><span class="t">Trading fee</span></li>
+              <li data-goto="4"><span class="n">4</span><span class="t">Coin type</span></li>
+              <li data-goto="5"><span class="n">5</span><span class="t">Payouts</span></li>
+              <li data-goto="6"><span class="n">6</span><span class="t">Review</span></li>
+            </ol>
+
+            <div class="step-pane active" data-step="1">
+            <div class="field" id="fName">
+              <label for="inName">Token name</label>
+              <input type="text" id="inName" maxlength="32" placeholder="e.g. Vice City Coin" autocomplete="off" />
+              <div class="err">Give your token a name (2–32 characters).</div>
+            </div>
+            <div class="field" id="fTicker">
+              <label for="inTicker">Ticker / symbol</label>
+              <input type="text" id="inTicker" maxlength="10" placeholder="e.g. VICE" autocomplete="off" style="text-transform:uppercase" />
+              <div class="err">Ticker must be 2–10 letters or numbers.</div>
+            </div>
+            <div class="field">
+              <label>Token image</label>
+              <div class="upload-box">
+                <div class="upload-preview" id="uploadPreview">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-4.5-4.5L6 21"/></svg>
+                </div>
+                <div>
+                  <label class="btn btn-ghost" for="inImage" style="height:38px;font-size:13.5px">Upload image</label>
+                  <input type="file" id="inImage" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none" />
+                  <div class="hint" style="margin-top:8px">PNG, JPG, WEBP or GIF, up to 5 MB. Square works best.</div>
+                  <div class="err" id="imgErr" style="color:var(--red);font-size:12.5px;font-weight:600;margin-top:6px"></div>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label for="inDesc">Description</label>
+              <textarea id="inDesc" maxlength="400" placeholder="What is this coin about?"></textarea>
+              <div class="hint"><span id="descCount">0</span>/400 — shown on your token page.</div>
+            </div>
+            <div class="field">
+              <label for="inWebsite">Website <span style="color:var(--faint);font-weight:600">(optional)</span></label>
+              <input type="text" id="inWebsite" placeholder="https://yourcoin.xyz" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="inX">X (Twitter) <span style="color:var(--faint);font-weight:600">(optional)</span></label>
+              <input type="text" id="inX" placeholder="https://x.com/yourcoin" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="inTelegram">Telegram <span style="color:var(--faint);font-weight:600">(optional)</span></label>
+              <input type="text" id="inTelegram" placeholder="https://t.me/yourcoin" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="inSupply">Total supply</label>
+              <input type="text" id="inSupply" value="1,000,000,000" disabled aria-disabled="true" />
+              <div class="hint">Fixed at 1 billion — the same supply as $GTA6L. Mint authority is revoked at launch.</div>
+            </div>
+            </div>
+
+            <div class="step-pane" data-step="2">
+            <div class="field" id="fPair">
+              <label>Pair asset</label>
+              <div class="hint" style="margin:0 0 4px">Your token's pool is priced in the asset you pick.</div>
+              <div class="pair-group-lbl">Crypto</div>
+              <div class="pair-grid" id="pairCrypto"></div>
+              <div class="pair-group-lbl">Tokenized stocks · xStocks by Backed</div>
+              <div class="pair-grid" id="pairStocks"></div>
+              <div class="hint" id="pairNote" style="margin-top:10px"></div>
+              <div class="err">Pick a pair asset.</div>
+            </div>
+            </div>
+
+            <div class="step-pane" data-step="3">
+            <div class="field">
+              <label>Trading fee</label>
+              <div class="hint" style="margin:0 0 12px">Charged on every buy and sell of your coin, on top of normal pool fees. What happens to it depends on your coin type — that's the next step.</div>
+              <div class="fee-big"><span id="feeVal">2</span>%</div>
+              <input type="range" id="feeRange" min="1" max="10" step="0.5" value="2" aria-label="Trading fee percent" />
+              <div class="fee-scale"><span>1% · lean</span><span>10% · max</span></div>
+              <div class="chip-row" id="feeRow" style="margin-top:12px">
+                <button type="button" class="chip" data-fee="1">1%</button>
+                <button type="button" class="chip" data-fee="2">2%</button>
+                <button type="button" class="chip" data-fee="3">3%</button>
+                <button type="button" class="chip" data-fee="5">5%</button>
+                <button type="button" class="chip" data-fee="10">10%</button>
+              </div>
+              <div class="hint" id="feeExample" style="margin-top:10px"></div>
+            </div>
+            </div>
+
+            <div class="step-pane" data-step="4">
+            <div class="field" style="margin-bottom:12px">
+              <label>Coin type</label>
+              <div class="hint" style="margin:0">How should your coin's trading fees be used?</div>
+            </div>
+            <div class="type-grid" id="typeGrid">
+              <button type="button" class="type-opt active" data-type="vanilla">
+                <span class="t-name">Vanilla</span>
+                <span class="t-desc">Fees are paid directly to your payout wallets. The classic creator launch — simple, all yours.</span>
+                <span class="t-split">100% creator payouts</span>
+              </button>
+              <button type="button" class="type-opt" data-type="holders">
+                <span class="t-name">Holder Rewards</span>
+                <span class="t-desc">Share the fees with everyone holding your coin, paid out pro-rata to holders.</span>
+                <span class="t-split">50% payouts · 50% holders</span>
+              </button>
+              <button type="button" class="type-opt" data-type="buyback">
+                <span class="t-name">Buyback</span>
+                <span class="t-desc">Fees automatically buy back your own token from the market, supporting the price.</span>
+                <span class="t-split">100% buyback</span>
+              </button>
+              <button type="button" class="type-opt" data-type="custom">
+                <span class="t-name">Custom Mix</span>
+                <span class="t-desc">Set your own split between creator payouts, holder rewards, and buyback.</span>
+                <span class="t-split">You set the %</span>
+              </button>
+            </div>
+            <div class="field" id="customSplit" style="display:none;margin-top:18px;margin-bottom:0">
+              <label>Your fee split</label>
+              <div class="split-grid">
+                <div><span class="split-lbl">Creator payouts</span><span class="split-in"><input type="number" id="splitCreator" min="0" max="100" step="1" value="50" /><span>%</span></span></div>
+                <div><span class="split-lbl">Holder rewards</span><span class="split-in"><input type="number" id="splitHolders" min="0" max="100" step="1" value="25" /><span>%</span></span></div>
+                <div><span class="split-lbl">Buyback</span><span class="split-in"><input type="number" id="splitBuyback" min="0" max="100" step="1" value="25" /><span>%</span></span></div>
+              </div>
+              <div class="hint" id="splitTotal" style="margin-top:8px"></div>
+              <div class="err">The three shares must add up to exactly 100%.</div>
+            </div>
+            </div>
+
+            <div class="step-pane" data-step="5">
+            <div class="field" style="margin-bottom:12px">
+              <label>Payout wallets</label>
+              <div class="hint" style="margin:0" id="payoutHint">The creator-payout share of fees is split between these Solana wallets. Add up to 10.</div>
+            </div>
+            <div id="payoutList"></div>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px">
+              <button type="button" class="btn btn-ghost" id="addPayoutBtn" style="height:38px;font-size:13.5px">+ Add recipient</button>
+              <span class="hint" id="payoutTotal" style="margin:0"></span>
+            </div>
+            <div id="payoutErr" style="color:var(--red);font-size:12.5px;font-weight:600;margin-top:8px;display:none"></div>
+            </div>
+
+            <div class="step-pane" data-step="6">
+            <div class="field" style="margin-bottom:10px">
+              <label>Review &amp; execute</label>
+              <div class="hint" style="margin:0">Check everything below — this is exactly what gets deployed on Solana.</div>
+            </div>
+            <div id="reviewBox"></div>
+            <div class="field" style="margin-top:20px">
+              <label for="inInitBuy">Initial purchase <span style="color:var(--faint);font-weight:600">(optional)</span></label>
+              <div class="initbuy-row">
+                <input type="text" inputmode="decimal" id="inInitBuy" placeholder="0.0" autocomplete="off" />
+                <span class="unit" id="initBuyUnit">SOL</span>
+              </div>
+              <div class="hint">Buy your own coin in the same transaction that deploys it, so you hold the first position. Leave at 0 to just deploy.</div>
+            </div>
+            <button type="button" class="btn btn-grad deploy-btn" id="deployBtn">Connect wallet to deploy</button>
+            <p class="note-line" id="deployNote">This preview validates your setup and shows the full deployment summary. On-chain deployment is switched on after review — nothing is minted or signed from this page yet.</p>
+            </div>
+
+            <div class="wiz-nav">
+              <button type="button" class="btn btn-ghost" id="wizBack" style="visibility:hidden">← Back</button>
+              <span class="wiz-count" id="wizCount">Step 1 of 6 · Identity</span>
+              <button type="button" class="btn btn-grad" id="wizNext">Continue →</button>
+            </div>
+          </form>
+
+          <div class="card summary-card">
+            <h3>Deployment summary</h3>
+            <div class="sum-row"><span class="k">Network</span><span class="v">Solana mainnet</span></div>
+            <div class="sum-row"><span class="k">Token name</span><span class="v" id="sumName">—</span></div>
+            <div class="sum-row"><span class="k">Ticker</span><span class="v" id="sumTicker">—</span></div>
+            <div class="sum-row"><span class="k">Total supply</span><span class="v num">1,000,000,000</span></div>
+            <div class="sum-row"><span class="k">Decimals</span><span class="v">6</span></div>
+            <div class="sum-row"><span class="k">Pair asset</span><span class="v" id="sumPair">—</span></div>
+            <div class="sum-row"><span class="k">Pair mint</span><span class="v mono" id="sumMint">—</span></div>
+            <div class="sum-row"><span class="k">Pool</span><span class="v">Raydium CPMM</span></div>
+            <div class="sum-row"><span class="k">Trading fee</span><span class="v" id="sumFee">2%</span></div>
+            <div class="sum-row"><span class="k">Coin type</span><span class="v" id="sumType">Vanilla</span></div>
+            <div class="sum-row"><span class="k">Payouts</span><span class="v" id="sumPayouts">Not set</span></div>
+            <div class="sum-row"><span class="k">Initial purchase</span><span class="v" id="sumInit">None</span></div>
+            <div class="sum-row"><span class="k">Mint authority</span><span class="v">Revoked at launch</span></div>
+            <p class="note-line">Six steps: identity, pair, fee, coin type, payouts, then review &amp; deploy. This card tracks your choices as you go.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site">
+      <div class="wrap foot-in">
+        <span style="display:inline-flex;align-items:center;gap:8px"><img src="assets/logo-rocket.webp" alt="" style="width:22px;height:22px;border-radius:6px" /> GTA 6 Launchpad · Solana mainnet</span>
+        <span class="spacer"></span>
+        <a href="https://x.com/gta6launch" target="_blank" rel="noopener">@gta6launch on X</a>
+        <a href="https://gta6launchpad.xyz" target="_blank" rel="noopener">gta6launchpad.xyz</a>
+        <span>$GTA6L · 71dBaV…pump</span>
+      </div>
+    </footer>
+
+    <!-- Wallet modal -->
+    <div class="modal-back" id="walletModal" role="dialog" aria-modal="true" aria-labelledby="walletModalTitle">
+      <div class="modal">
+        <h3 id="walletModalTitle">Connect a wallet</h3>
+        <p>Connect a Solana wallet to buy, sell, and launch coins. Browsing is free — no wallet needed.</p>
+        <button type="button" class="wallet-opt" id="optPhantom">
+          <span style="width:30px;height:30px;border-radius:8px;background:#ab9ff2;color:#2b1a63;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:15px">P</span>
+          Phantom <span class="st" id="stPhantom">Checking…</span>
+        </button>
+        <button type="button" class="wallet-opt" id="optSolflare">
+          <span style="width:30px;height:30px;border-radius:8px;background:#fc7227;color:#4d2100;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:15px">S</span>
+          Solflare <span class="st" id="stSolflare">Checking…</span>
+        </button>
+        <button type="button" class="btn btn-ghost" id="walletModalClose" style="width:100%;margin-top:6px">Cancel</button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status"></div>
+
+    <script>
+    "use strict";
+    (function(){
+    /* ================= Constants ================= */
+    var GTA6L_MINT = "71dBaVmZcGC2ShnnFWHrgFVMsgRe7dRR8icCWjJkpump";
+    var SOL_MINT = "So11111111111111111111111111111111111111112";
+    var USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+    var RPC = "https://api.mainnet-beta.solana.com";
+    var STOCKS = [
+      {sym:"NVDAx", name:"NVIDIA", mint:"Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh"},
+      {sym:"TSLAx", name:"Tesla", mint:"XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB"},
+      {sym:"AAPLx", name:"Apple", mint:"XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp"},
+      {sym:"MSFTx", name:"Microsoft", mint:"XspzcW1PRtgf6Wj92HCiZdjzKCyFekVD8P5Ueh3dRMX"},
+      {sym:"AMZNx", name:"Amazon", mint:"Xs3eBt7uRfJX8QUs4suhyU8p2M6DoUDrJyWBa8LLZsg"},
+      {sym:"METAx", name:"Meta", mint:"Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu"},
+      {sym:"SPYx", name:"S&P 500 ETF", mint:"XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W"},
+      {sym:"QQQx", name:"Nasdaq-100 ETF", mint:"Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ"},
+      {sym:"SPCXx", name:"SpaceX", mint:"Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8"}
+    ];
+    var PAIRS = [
+      {sym:"SOL", name:"Solana", mint:SOL_MINT, stock:false},
+      {sym:"USDC", name:"USD Coin", mint:USDC_MINT, stock:false}
+    ].concat(STOCKS.map(function(s){ return {sym:s.sym, name:s.name, mint:s.mint, stock:true}; }));
+
+    /* ================= State ================= */
+    var state = {
+      pair: null,            // DEXscreener pair for GTA6L
+      spark: [],             // closes for sparkline
+      wallet: null,          // {provider, pubkey}
+      solBal: null, gtaBal: null,
+      side: "buy", slippage: 100,
+      tf: "1h", chartType: "candle", candles: [],
+      tab: "all", viewMode: "table", watched: false,
+      pairSel: null, feePct: 2, step: 1, coinType: "vanilla",
+      quoteTimer: null, quoteSeq: 0
+    };
+
+    function $(id){ return document.getElementById(id); }
+    function el(html){ var d=document.createElement("div"); d.innerHTML=html; return d.firstElementChild; }
+
+    /* ================= Formatting ================= */
+    var SUBS = {"0":"₀","1":"₁","2":"₂","3":"₃","4":"₄","5":"₅","6":"₆","7":"₇","8":"₈","9":"₉"};
+    function subNum(n){ return String(n).split("").map(function(c){ return SUBS[c]||c; }).join(""); }
+    function fmtPrice(p){
+      if(p==null || isNaN(p)) return "—";
+      if(p>=1) return "$"+p.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+      if(p>=0.01) return "$"+p.toFixed(4);
+      var frac = p.toFixed(18).split(".")[1], zeros=0;
+      while(frac[zeros]==="0") zeros++;
+      if(zeros>=3){ return "$0.0"+subNum(zeros)+frac.slice(zeros,zeros+4); }
+      return "$"+p.toFixed(6);
+    }
+    function fmtUSD(v){
+      if(v==null || isNaN(v)) return "—";
+      return "$"+Number(v).toLocaleString("en-US",{notation:"compact",maximumFractionDigits:2});
+    }
+    function fmtNum(v){
+      if(v==null || isNaN(v)) return "—";
+      return Number(v).toLocaleString("en-US");
+    }
+    function fmtPct(v){
+      if(v==null || isNaN(v)) return "—";
+      return (v>0?"+":"")+Number(v).toFixed(2)+"%";
+    }
+    function fmtAge(ms){
+      if(!ms) return "—";
+      var s = Math.max(0,(Date.now()-ms)/1000);
+      if(s<3600) return Math.max(1,Math.floor(s/60))+"m";
+      if(s<86400) return Math.floor(s/3600)+"h";
+      var d = Math.floor(s/86400);
+      return d<30 ? d+"d" : Math.floor(d/30)+"mo";
+    }
+    function fmtTokens(v, maxFrac){
+      if(v==null || isNaN(v)) return "—";
+      return v.toLocaleString("en-US",{maximumFractionDigits: maxFrac==null?2:maxFrac});
+    }
+    function truncAddr(a){ return a ? a.slice(0,4)+"…"+a.slice(-4) : "—"; }
+    function toast(msg){
+      var t=$("toast"); t.textContent=msg; t.classList.add("show");
+      clearTimeout(t._h); t._h=setTimeout(function(){ t.classList.remove("show"); }, 3200);
+    }
+    function copyText(txt, msg){
+      function done(){ toast(msg||"Copied to clipboard"); }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(txt).then(done, function(){ fallback(); });
+      } else fallback();
+      function fallback(){
+        var ta=document.createElement("textarea"); ta.value=txt; ta.style.position="fixed"; ta.style.opacity="0";
+        document.body.appendChild(ta); ta.select();
+        try{ document.execCommand("copy"); done(); }catch(e){ toast("Copy failed — long-press to copy"); }
+        document.body.removeChild(ta);
+      }
+    }
+
+    /* ================= Navigation ================= */
+    function showView(name){
+      ["explore","token","create"].forEach(function(v){
+        $("view-"+v).classList.toggle("active", v===name);
+      });
+      $("navExplore").classList.toggle("active", name==="explore" || name==="token");
+      $("navCreate").classList.toggle("active", name==="create");
+      window.scrollTo(0, 0);
+      if(name==="token"){ drawChart(); refreshQuote(); }
+    }
+    document.querySelectorAll("[data-nav]").forEach(function(b){
+      b.addEventListener("click", function(e){ e.preventDefault(); showView(b.getAttribute("data-nav")); });
+    });
+
+    /* ================= Theme ================= */
+    $("themeToggle").addEventListener("click", function(){
+      var html=document.documentElement;
+      var dark = html.getAttribute("data-theme")!=="dark";
+      html.setAttribute("data-theme", dark?"dark":"light");
+      $("themeIconMoon").style.display = dark?"none":"";
+      $("themeIconSun").style.display = dark?"":"none";
+      drawChart();
+    });
+
+    /* ================= Live data: DEXscreener ================= */
+    function fetchJSON(url){
+      return fetch(url).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); });
+    }
+    function loadToken(){
+      return fetchJSON("https://api.dexscreener.com/latest/dex/tokens/"+GTA6L_MINT)
+        .then(function(d){
+          var pairs = (d.pairs||[]).filter(function(p){ return p.chainId==="solana"; });
+          if(!pairs.length) throw new Error("no pair");
+          pairs.sort(function(a,b){ return (b.volume&&b.volume.h24||0)-(a.volume&&a.volume.h24||0); });
+          state.pair = pairs[0];
+          renderToken();
+        })
+        .catch(function(){
+          $("tokenRows").innerHTML = "";
+          $("emptyTitle").textContent = "Live data is taking a moment";
+          $("emptyText").textContent = "DEXscreener didn't respond just now. Refresh the page to load $GTA6L's live price, volume and chart.";
+        });
+    }
+    function loadTicker(){
+      var addrs = [GTA6L_MINT].concat(STOCKS.map(function(s){ return s.mint; })).join(",");
+      fetchJSON("https://api.dexscreener.com/latest/dex/tokens/"+addrs)
+        .then(function(d){
+          var byMint = {};
+          (d.pairs||[]).forEach(function(p){
+            var m = p.baseToken.address;
+            if(!byMint[m] || ((p.volume&&p.volume.h24)||0) > ((byMint[m].volume&&byMint[m].volume.h24)||0)) byMint[m]=p;
+          });
+          var items = [];
+          function item(sym, p){
+            if(!p) return '<span class="tick-item"><b>'+sym+'</b> —</span>';
+            var chg = p.priceChange && p.priceChange.h24;
+            var cls = chg==null ? "" : (chg>=0 ? "up":"down");
+            return '<span class="tick-item"><b>'+sym+'</b> '+fmtPrice(parseFloat(p.priceUsd))+
+              (chg==null?"":' <span class="'+cls+'">'+fmtPct(chg)+'</span>')+
+              ' <span class="dot"></span></span>';
+          }
+          items.push(item("GTA6L", byMint[GTA6L_MINT]));
+          STOCKS.forEach(function(s){ items.push(item(s.sym, byMint[s.mint])); });
+          var half = items.join("");
+          $("tickerTrack").innerHTML = half + half; // duplicate for seamless loop
+        })
+        .catch(function(){
+          $("tickerTrack").innerHTML = '<span class="tick-item"><b>GTA6L</b> live prices unavailable right now</span>';
+        });
+    }
+
+    /* ================= Sparkline + chart (GeckoTerminal) ================= */
+    var TF_MAP = {
+      "1m":{path:"minute", agg:1}, "5m":{path:"minute", agg:5}, "15m":{path:"minute", agg:15},
+      "1h":{path:"hour", agg:1}, "4h":{path:"hour", agg:4}, "1d":{path:"day", agg:1}
+    };
+    function loadOHLCV(tf, limit){
+      if(!state.pair) return Promise.resolve([]);
+      var m = TF_MAP[tf];
+      var url = "https://api.geckoterminal.com/api/v2/networks/solana/pools/"+state.pair.pairAddress+
+        "/ohlcv/"+m.path+"?aggregate="+m.agg+"&limit="+(limit||120)+"&currency=usd";
+      return fetchJSON(url).then(function(d){
+        var list = (d.data && d.data.attributes && d.data.attributes.ohlcv_list) || [];
+        return list.slice().reverse().map(function(c){
+          return {t:c[0]*1000, o:c[1], h:c[2], l:c[3], c:c[4], v:c[5]};
+        });
+      }).catch(function(){ return []; });
+    }
+    function sparkSVG(closes, w, h){
+      if(!closes || closes.length<2) return '<span class="dash">—</span>';
+      var min=Math.min.apply(null,closes), max=Math.max.apply(null,closes), rng=(max-min)||1;
+      var pts = closes.map(function(v,i){
+        var x=(i/(closes.length-1))*w, y=h-3-((v-min)/rng)*(h-6);
+        return x.toFixed(1)+","+y.toFixed(1);
+      }).join(" ");
+      var col = closes[closes.length-1] >= closes[0] ? "var(--green)" : "var(--red)";
+      return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" aria-hidden="true"><polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+    }
+
+    function renderToken(){
+      var p = state.pair; if(!p) return;
+      var price = parseFloat(p.priceUsd);
+      var mcap = p.marketCap, fdv = p.fdv;
+      var vol24 = p.volume && p.volume.h24;
+      var tx = p.txns && p.txns.h24 ? p.txns.h24 : {buys:0,sells:0};
+      var trades = (tx.buys||0)+(tx.sells||0);
+      var chg = p.priceChange || {};
+      var age = fmtAge(p.pairCreatedAt);
+
+      /* stats */
+      document.querySelector('[data-stat="vol"]').textContent = fmtUSD(vol24);
+      document.querySelector('[data-stat="txns"]').textContent = fmtNum(trades);
+      document.querySelector('[data-stat="new"]').textContent = (Date.now()-p.pairCreatedAt < 86400000) ? "1" : "0";
+      document.querySelector('[data-stat="gainer"]').innerHTML =
+        '<span class="'+(chg.h24>=0?"up":"down")+'">'+fmtPct(chg.h24)+'</span>';
+      document.querySelector('[data-stat="gainerSub"]').textContent = "$GTA6L · only listed token";
+
+      /* table row */
+      var row = document.createElement("tr");
+      row.setAttribute("tabindex","0");
+      row.setAttribute("aria-label","View GTA 6 LAUNCHPAD token page");
+      row.innerHTML =
+        '<td class="num">1</td>'+
+        '<td><div class="tok-cell"><img class="tok-img" src="assets/logo-rocket.webp" alt="GTA6L token image" />'+
+          '<div><div class="tok-name">GTA 6 LAUNCHPAD <span class="badge live">Live</span></div>'+
+          '<div class="tok-sym">$GTA6L · '+fmtPrice(price)+'</div></div></div></td>'+
+        '<td class="num">'+age+'</td>'+
+        '<td class="num" style="font-weight:700">'+fmtUSD(mcap)+'</td>'+
+        '<td class="num '+(chg.h24>=0?"up":"down")+'" style="font-weight:700">'+fmtPct(chg.h24)+'</td>'+
+        '<td class="num">'+fmtUSD(vol24)+'</td>'+
+        '<td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td><td class="dash">—</td>'+
+        '<td class="num">'+fmtNum(trades)+'</td>'+
+        '<td class="spark-cell"><span class="skel">…</span></td>'+
+        '<td><button type="button" class="watch-btn" aria-label="Watch GTA6L">'+starSVG()+'</button></td>';
+      row.addEventListener("click", function(e){
+        if(e.target.closest(".watch-btn")) return;
+        showView("token");
+      });
+      row.addEventListener("keydown", function(e){ if(e.key==="Enter") showView("token"); });
+      var wb = row.querySelector(".watch-btn");
+      wb.addEventListener("click", function(){ toggleWatch(wb); });
+      if(state.watched) wb.classList.add("on");
+      $("tokenRows").innerHTML=""; $("tokenRows").appendChild(row);
+
+      /* grid card */
+      var card = el(
+        '<div class="coin-card" tabindex="0" role="button" aria-label="View GTA 6 LAUNCHPAD token page">'+
+          '<div class="cc-head"><img src="assets/logo-rocket.webp" alt="GTA6L token image" />'+
+            '<div style="flex:1;min-width:0"><div class="cc-name">GTA 6 LAUNCHPAD</div>'+
+            '<div class="cc-meta">$GTA6L · '+age+' old · Pump.fun</div>'+
+            '<div style="margin-top:5px"><span class="badge live">Live</span> <span class="badge">Mint revoked</span></div></div>'+
+            '<button type="button" class="watch-btn" aria-label="Watch GTA6L">'+starSVG()+'</button></div>'+
+          '<div class="cc-spark"></div>'+
+          '<div class="cc-nums">'+
+            '<div><div class="lbl">Market cap</div><div class="v num">'+fmtUSD(mcap)+' <span class="'+(chg.h24>=0?"up":"down")+'" style="font-size:13px">'+fmtPct(chg.h24)+'</span></div></div>'+
+            '<div><div class="lbl">Price</div><div class="v num">'+fmtPrice(price)+'</div></div>'+
+            '<div><div class="lbl">24h vol</div><div class="v small num">'+fmtUSD(vol24)+'</div></div>'+
+            '<div><div class="lbl">24h trades</div><div class="v small num">'+fmtNum(trades)+'</div></div>'+
+          '</div></div>');
+      card.addEventListener("click", function(e){ if(e.target.closest(".watch-btn")) return; showView("token"); });
+      card.addEventListener("keydown", function(e){ if(e.key==="Enter") showView("token"); });
+      var cwb = card.querySelector(".watch-btn");
+      cwb.addEventListener("click", function(){ toggleWatch(cwb); });
+      if(state.watched) cwb.classList.add("on");
+      $("tokenGrid").innerHTML=""; $("tokenGrid").appendChild(card);
+      state._cardSpark = card.querySelector(".cc-spark");
+
+      /* detail header/stats */
+      $("dPrice").textContent = fmtPrice(price);
+      setChg($("dChg24"), "24h ", chg.h24);
+      $("dChg1h").textContent = "1h "+fmtPct(chg.h1);
+      $("dChg6h").textContent = "6h "+fmtPct(chg.h6);
+      $("dMcap").textContent = fmtUSD(mcap);
+      $("dFdv").textContent = fmtUSD(fdv);
+      $("dVol").textContent = fmtUSD(vol24);
+      $("dTrades").textContent = fmtNum(trades);
+      $("dAge").textContent = age;
+      $("dLiq").textContent = p.liquidity && p.liquidity.usd ? fmtUSD(p.liquidity.usd) : "—";
+      $("techPair").textContent = p.pairAddress;
+      $("riskMcap").textContent = "This token launched "+age+" ago and trades on the Pump.fun bonding curve at a "+fmtUSD(mcap)+" market cap, so price can move fast in both directions and large orders slip.";
+      $("caText").textContent = truncAddr(GTA6L_MINT);
+      $("caText").title = GTA6L_MINT;
+
+      /* sparkline from real hourly closes */
+      loadOHLCV("1h", 24).then(function(cs){
+        state.spark = cs.map(function(c){ return c.c; });
+        var cell = document.querySelector(".spark-cell");
+        if(cell) cell.innerHTML = sparkSVG(state.spark, 96, 30);
+        if(state._cardSpark) state._cardSpark.innerHTML = sparkSVG(state.spark, 260, 56);
+      });
+      /* chart if detail open */
+      if($("view-token").classList.contains("active")) loadChart();
+      refreshQuote();
+    }
+    function setChg(elm, prefix, v){
+      elm.textContent = prefix + fmtPct(v);
+      elm.classList.remove("up","down");
+      if(v!=null && !isNaN(v)) elm.classList.add(v>=0?"up":"down");
+    }
+    function starSVG(){
+      return '<svg width="17" height="17" viewBox="0 0 24 24" fill="'+ 'none' +'" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 17l-5.4 2.8 1.1-6.1L3.2 9.4l6.1-.8L12 3Z"/></svg>';
+    }
+    function toggleWatch(btn){
+      state.watched = !state.watched;
+      document.querySelectorAll(".watch-btn").forEach(function(b){
+        b.classList.toggle("on", state.watched);
+        b.querySelector("svg").setAttribute("fill", state.watched ? "currentColor" : "none");
+      });
+      var dw = $("detailWatchBtn");
+      dw.querySelector("svg").setAttribute("fill", state.watched ? "#eab308" : "none");
+      dw.querySelector("span").textContent = state.watched ? "Watching" : "Watch";
+      toast(state.watched ? "Added GTA6L to your watchlist" : "Removed GTA6L from your watchlist");
+    }
+    $("detailWatchBtn").addEventListener("click", function(){
+      state.watched = !state.watched;
+      document.querySelectorAll(".watch-btn").forEach(function(b){
+        b.classList.toggle("on", state.watched);
+        b.querySelector("svg").setAttribute("fill", state.watched ? "currentColor" : "none");
+      });
+      this.querySelector("svg").setAttribute("fill", state.watched ? "#eab308" : "none");
+      this.querySelector("span").textContent = state.watched ? "Watching" : "Watch";
+    });
+
+    /* ================= Chart ================= */
+    function loadChart(){
+      loadOHLCV(state.tf, 120).then(function(cs){
+        state.candles = cs;
+        drawChart();
+      });
+    }
+    function drawChart(){
+      var box = $("chartBox");
+      if(!$("view-token").classList.contains("active")) return;
+      var cs = state.candles;
+      if(!cs || !cs.length){
+        box.innerHTML = '<p class="skel" style="padding:30px 0;text-align:center">Chart data unavailable for this timeframe right now.</p>';
+        return;
+      }
+      var W = Math.max(300, box.clientWidth || 760), H = 300, padR = 64, padB = 22, padT = 10;
+      var iw = W - padR, ih = H - padB - padT;
+      var min = Math.min.apply(null, cs.map(function(c){return c.l;}));
+      var max = Math.max.apply(null, cs.map(function(c){return c.h;}));
+      var rng = (max-min) || 1; min -= rng*0.06; max += rng*0.06; rng = max-min;
+      function X(i){ return (i+0.5) * (iw/cs.length); }
+      function Y(v){ return padT + (1-(v-min)/rng)*ih; }
+      var up = cs[cs.length-1].c >= cs[0].o;
+      var colMain = up ? "#15a34a" : "#e5484d";
+      var s = '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="GTA6L price chart">';
+      /* gridlines + price axis */
+      for(var g=0; g<=4; g++){
+        var v = min + rng*g/4, y = Y(v);
+        s += '<line x1="0" y1="'+y+'" x2="'+iw+'" y2="'+y+'" stroke="var(--border)" stroke-width="1" stroke-dasharray="3 4"/>';
+        s += '<text class="axis-lbl" x="'+(iw+8)+'" y="'+(y+3.5)+'">'+fmtPrice(v).replace("$","")+'</text>';
+      }
+      /* time axis */
+      for(var t=0; t<4; t++){
+        var idx = Math.floor((cs.length-1)*t/3), d = new Date(cs[idx].t);
+        var lbl = state.tf==="1d" ? d.toLocaleDateString("en-US",{month:"short",day:"numeric"})
+                                 : d.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit",hour12:false});
+        s += '<text class="axis-lbl" x="'+Math.min(X(idx), iw-30)+'" y="'+(H-6)+'">'+lbl+'</text>';
+      }
+      if(state.chartType==="candle"){
+        var bw = Math.max(1.5, (iw/cs.length)*0.62);
+        cs.forEach(function(c, i){
+          var col = c.c>=c.o ? "#15a34a" : "#e5484d";
+          s += '<line x1="'+X(i)+'" y1="'+Y(c.h)+'" x2="'+X(i)+'" y2="'+Y(c.l)+'" stroke="'+col+'" stroke-width="1"/>';
+          var y1=Y(Math.max(c.o,c.c)), y2=Y(Math.min(c.o,c.c));
+          s += '<rect x="'+(X(i)-bw/2)+'" y="'+y1+'" width="'+bw+'" height="'+Math.max(1,y2-y1)+'" fill="'+col+'"/>';
+        });
+      } else {
+        var pts = cs.map(function(c,i){ return X(i).toFixed(1)+","+Y(c.c).toFixed(1); }).join(" ");
+        s += '<polygon points="0,'+(padT+ih)+' '+pts+' '+iw+','+(padT+ih)+'" fill="'+colMain+'" opacity="0.10"/>';
+        s += '<polyline points="'+pts+'" fill="none" stroke="'+colMain+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+      }
+      s += "</svg>";
+      box.innerHTML = s;
+    }
+    $("tfSeg").querySelectorAll("button").forEach(function(b){
+      b.addEventListener("click", function(){
+        $("tfSeg").querySelectorAll("button").forEach(function(x){ x.classList.remove("active"); });
+        b.classList.add("active"); state.tf = b.getAttribute("data-tf"); loadChart();
+      });
+    });
+    $("chartTypeSeg").querySelectorAll("button").forEach(function(b){
+      b.addEventListener("click", function(){
+        $("chartTypeSeg").querySelectorAll("button").forEach(function(x){ x.classList.remove("active"); });
+        b.classList.add("active"); state.chartType = b.getAttribute("data-ct"); drawChart();
+      });
+    });
+    var rsz; window.addEventListener("resize", function(){ clearTimeout(rsz); rsz=setTimeout(drawChart, 180); });
+
+    /* ================= Explore controls ================= */
+    $("filterTabs").querySelectorAll(".tab").forEach(function(t){
+      t.addEventListener("click", function(){
+        $("filterTabs").querySelectorAll(".tab").forEach(function(x){ x.classList.remove("active"); });
+        t.classList.add("active"); state.tab = t.getAttribute("data-tab"); applyFilters();
+      });
+    });
+    function applyFilters(){
+      var showToken = (state.tab==="all" || state.tab==="new");
+      var q = ($("searchInput").value||"").trim().toLowerCase();
+      if(q && !("gta 6 launchpad gta6l".indexOf(q)>-1 || "gta 6 launchpad".indexOf(q)>-1)) showToken = false;
+      $("tableWrap").style.display = (showToken && state.viewMode==="table") ? "" : "none";
+      $("gridWrap").style.display = (showToken && state.viewMode==="grid") ? "block" : "none";
+      var emp = $("exploreEmpty");
+      if(!showToken){
+        emp.style.display="block";
+        if(q){ $("emptyTitle").textContent = "No tokens match “"+$("searchInput").value.trim()+"”"; }
+        else if(state.tab!=="all" && state.tab!=="new"){ $("emptyTitle").textContent = "Nothing here yet"; $("emptyText").textContent = "No listed token carries this badge yet. Launch a coin with these features and it will show up under this tab."; }
+      } else {
+        emp.style.display="block";
+        $("emptyTitle").textContent = "No other tokens yet — be the first to launch";
+        $("emptyText").textContent = "GTA 6 Launchpad just opened its doors on Solana. Launch the next coin, pair it with SOL, USDC, or a tokenized stock like NVDAx or TSLAx, and it will trade here.";
+      }
+    }
+    $("searchInput").addEventListener("input", applyFilters);
+    $("sortSel").addEventListener("change", function(){ /* single listed token — order is already correct */ });
+    $("viewTableBtn").addEventListener("click", function(){ setViewMode("table"); });
+    $("viewGridBtn").addEventListener("click", function(){ setViewMode("grid"); });
+    function setViewMode(m){
+      state.viewMode = m;
+      $("viewTableBtn").classList.toggle("active", m==="table");
+      $("viewGridBtn").classList.toggle("active", m==="grid");
+      applyFilters();
+    }
+
+    /* ================= Wallet ================= */
+    function getProvider(kind){
+      if(kind==="phantom"){
+        if(window.phantom && window.phantom.solana) return window.phantom.solana;
+        if(window.solana && window.solana.isPhantom) return window.solana;
+        return null;
+      }
+      if(kind==="solflare"){
+        if(window.solflare) return window.solflare;
+        if(window.solana && window.solana.isSolflare) return window.solana;
+        return null;
+      }
+      return null;
+    }
+    function openWalletModal(){
+      var ph = getProvider("phantom"), sf = getProvider("solflare");
+      $("stPhantom").textContent = ph ? "Detected" : "Not installed";
+      $("stPhantom").className = "st" + (ph?" ok":"");
+      $("stSolflare").textContent = sf ? "Detected" : "Not installed";
+      $("stSolflare").className = "st" + (sf?" ok":"");
+      $("walletModal").classList.add("open");
+    }
+    function closeWalletModal(){ $("walletModal").classList.remove("open"); }
+    $("walletModalClose").addEventListener("click", closeWalletModal);
+    $("walletModal").addEventListener("click", function(e){ if(e.target===this) closeWalletModal(); });
+    $("optPhantom").addEventListener("click", function(){ connectWallet("phantom"); });
+    $("optSolflare").addEventListener("click", function(){ connectWallet("solflare"); });
+    function connectWallet(kind){
+      var prov = getProvider(kind);
+      if(!prov){
+        window.open(kind==="phantom" ? "https://phantom.app/" : "https://solflare.com/", "_blank", "noopener");
+        toast("No "+(kind==="phantom"?"Phantom":"Solflare")+" wallet found — install it, then try again.");
+        return;
+      }
+      var p = prov.connect ? prov.connect() : Promise.reject(new Error("no connect"));
+      Promise.resolve(p).then(function(res){
+        var pk = (res && res.publicKey) || prov.publicKey;
+        if(!pk) throw new Error("no key");
+        state.wallet = { provider: prov, pubkey: pk.toString(), kind: kind };
+        closeWalletModal();
+        onWalletChanged();
+        toast("Wallet connected: "+truncAddr(state.wallet.pubkey));
+        loadBalances();
+      }).catch(function(){ toast("Wallet connection was cancelled or failed."); });
+    }
+    $("walletBtn").addEventListener("click", function(){
+      if(state.wallet){
+        var pop = $("walletPop");
+        pop.style.display = pop.style.display==="none" ? "block" : "none";
+      } else openWalletModal();
+    });
+    document.addEventListener("click", function(e){
+      if(state.wallet && !e.target.closest(".wallet-anchor")) $("walletPop").style.display="none";
+    });
+    $("walletCopyBtn").addEventListener("click", function(){ if(state.wallet) copyText(state.wallet.pubkey, "Wallet address copied"); });
+    $("walletDisconnectBtn").addEventListener("click", function(){
+      if(state.wallet && state.wallet.provider.disconnect){
+        try{ state.wallet.provider.disconnect(); }catch(e){}
+      }
+      state.wallet = null; state.solBal = null; state.gtaBal = null;
+      $("walletPop").style.display="none";
+      onWalletChanged();
+      toast("Wallet disconnected");
+    });
+    function onWalletChanged(){
+      var btn = $("walletBtn");
+      if(state.wallet){
+        btn.textContent = truncAddr(state.wallet.pubkey);
+        $("walletPopAddr").textContent = state.wallet.pubkey;
+      } else {
+        btn.textContent = "Connect wallet";
+      }
+      updateActionBtn(); updateBalText(); updateDeployBtn();
+    }
+    function rpc(method, params){
+      return fetch(RPC, {method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({jsonrpc:"2.0", id:1, method:method, params:params})})
+        .then(function(r){ return r.json(); });
+    }
+    function loadBalances(){
+      if(!state.wallet) return;
+      var pk = state.wallet.pubkey;
+      rpc("getBalance", [pk]).then(function(j){
+        if(j && j.result) { state.solBal = j.result.value/1e9; updateBalText(); }
+      }).catch(function(){});
+      rpc("getTokenAccountsByOwner", [pk, {mint: GTA6L_MINT}, {encoding:"jsonParsed"}]).then(function(j){
+        var total = 0;
+        ((j && j.result && j.result.value) || []).forEach(function(a){
+          var amt = a.account.data.parsed.info.tokenAmount;
+          total += parseFloat(amt.uiAmountString || "0");
+        });
+        state.gtaBal = total; updateBalText();
+      }).catch(function(){});
+    }
+    function updateBalText(){
+      if(!state.wallet){ $("balText").textContent = "Connect wallet to see balance"; return; }
+      if(state.side==="buy"){
+        $("balText").textContent = state.solBal==null ? "Loading…" : fmtTokens(state.solBal,4)+" SOL";
+      } else {
+        $("balText").textContent = state.gtaBal==null ? "Loading…" : fmtTokens(state.gtaBal,2)+" GTA6L";
+      }
+    }
+
+    /* ================= Buy / sell ================= */
+    function setSide(side){
+      state.side = side;
+      $("tabBuy").classList.toggle("active", side==="buy");
+      $("tabBuy").classList.toggle("buy", side==="buy");
+      $("tabSell").classList.toggle("active", side==="sell");
+      $("tabSell").classList.toggle("sell", side==="sell");
+      $("amtUnit").textContent = side==="buy" ? "SOL" : "GTA6L";
+      $("recvUnit").textContent = side==="buy" ? "GTA6L · live Jupiter quote" : "SOL · live Jupiter quote";
+      updateBalText(); updateActionBtn(); refreshQuote();
+    }
+    $("tabBuy").addEventListener("click", function(){ setSide("buy"); });
+    $("tabSell").addEventListener("click", function(){ setSide("sell"); });
+    function updateActionBtn(){
+      var b = $("actionBtn");
+      b.classList.remove("buy","sell","connect");
+      if(!state.wallet){
+        b.classList.add("connect");
+        b.textContent = state.side==="buy" ? "Connect wallet to buy" : "Connect wallet to sell";
+      } else {
+        b.classList.add(state.side);
+        b.textContent = state.side==="buy" ? "Buy GTA6L" : "Sell GTA6L";
+      }
+    }
+    $("actionBtn").addEventListener("click", function(){
+      if(!state.wallet){ openWalletModal(); return; }
+      toast("Quotes are live for review — swap execution is switched on after this preview is approved. Nothing was signed.");
+    });
+    $("quickBuyRow").querySelectorAll(".chip").forEach(function(c){
+      c.addEventListener("click", function(){
+        if(state.side!=="buy") setSide("buy");
+        $("amtInput").value = c.getAttribute("data-qb");
+        refreshQuote();
+      });
+    });
+    $("slipRow").querySelectorAll(".chip").forEach(function(c){
+      c.addEventListener("click", function(){
+        $("slipRow").querySelectorAll(".chip").forEach(function(x){ x.classList.remove("active"); });
+        c.classList.add("active");
+        state.slippage = parseInt(c.getAttribute("data-slip"),10);
+        refreshQuote();
+      });
+    });
+    $("pctRow").querySelectorAll("button").forEach(function(b){
+      b.addEventListener("click", function(){
+        var pct = parseInt(b.getAttribute("data-pct"),10);
+        var bal = state.side==="buy" ? state.solBal : state.gtaBal;
+        if(!state.wallet){ openWalletModal(); return; }
+        if(bal==null){ toast("Balance is still loading — try again in a second."); return; }
+        var amt = bal * pct/100;
+        if(state.side==="buy" && pct===100) amt = Math.max(0, bal - 0.005); // keep a little SOL for fees
+        $("amtInput").value = state.side==="buy" ? amt.toFixed(4) : Math.floor(amt).toString();
+        refreshQuote();
+      });
+    });
+    $("amtInput").addEventListener("input", function(){
+      clearTimeout(state.quoteTimer);
+      state.quoteTimer = setTimeout(refreshQuote, 400);
+    });
+    function refreshQuote(){
+      var raw = parseFloat(($("amtInput").value||"").replace(/,/g,""));
+      var price = state.pair ? parseFloat(state.pair.priceUsd) : null;
+      if(isNaN(raw) || raw<=0){
+        $("recvAmt").textContent = "—"; $("qImpact").textContent="—"; $("qMin").textContent="—"; $("qRoute").textContent="—";
+        $("amtUsd").textContent = "≈ —"; return;
+      }
+      if(state.side==="buy"){
+        $("amtUsd").textContent = "≈ " + (price ? "spending "+fmtTokens(raw,4)+" SOL" : "—");
+      } else {
+        $("amtUsd").textContent = price ? "≈ "+fmtUSD(raw*price) : "≈ —";
+      }
+      var inMint = state.side==="buy" ? SOL_MINT : GTA6L_MINT;
+      var outMint = state.side==="buy" ? GTA6L_MINT : SOL_MINT;
+      var amount = state.side==="buy" ? Math.floor(raw*1e9) : Math.floor(raw*1e6);
+      if(amount<=0) return;
+      var seq = ++state.quoteSeq;
+      $("recvAmt").innerHTML = '<span class="spin"></span>';
+      var url = "https://lite-api.jup.ag/swap/v1/quote?inputMint="+inMint+"&outputMint="+outMint+
+        "&amount="+amount+"&slippageBps="+state.slippage;
+      fetchJSON(url).then(function(q){
+        if(seq!==state.quoteSeq) return;
+        var out = parseFloat(q.outAmount) / (state.side==="buy" ? 1e6 : 1e9);
+        $("recvAmt").textContent = fmtTokens(out, state.side==="buy"?0:4)+" "+(state.side==="buy"?"GTA6L":"SOL");
+        var min = parseFloat(q.otherAmountThreshold) / (state.side==="buy" ? 1e6 : 1e9);
+        $("qMin").textContent = fmtTokens(min, state.side==="buy"?0:4)+" "+(state.side==="buy"?"GTA6L":"SOL");
+        $("qImpact").textContent = (q.priceImpactPct==null ? "—" : (parseFloat(q.priceImpactPct)*100).toFixed(2)+"%");
+        var route = (q.routePlan||[]).map(function(r){ return r.swapInfo && r.swapInfo.label; }).filter(Boolean).join(" → ");
+        $("qRoute").textContent = route || "Jupiter";
+        if(state.side==="buy" && q.swapUsdValue) $("amtUsd").textContent = "≈ "+fmtUSD(parseFloat(q.swapUsdValue));
+      }).catch(function(){
+        if(seq!==state.quoteSeq) return;
+        $("recvAmt").textContent = "No route";
+        $("qImpact").textContent="—"; $("qMin").textContent="—"; $("qRoute").textContent="—";
+      });
+    }
+
+    /* ================= Detail misc ================= */
+    $("copyCaBtn").addEventListener("click", function(){ copyText(GTA6L_MINT, "Contract address copied"); });
+    $("addWalletBtn").addEventListener("click", function(){
+      copyText(GTA6L_MINT, "Mint address copied — paste it into your wallet's add-token form");
+    });
+
+    /* ================= Create form ================= */
+    function pairBtn(p){
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "pair-opt"; b.setAttribute("data-sym", p.sym);
+      b.innerHTML = '<span class="ps">'+p.sym+(p.stock?' <span class="badge stock">xStocks</span>':"")+'</span><span class="pn">'+p.name+'</span>';
+      b.addEventListener("click", function(){ selectPair(p, b); });
+      return b;
+    }
+    PAIRS.slice(0,2).forEach(function(p){ $("pairCrypto").appendChild(pairBtn(p)); });
+    PAIRS.slice(2).forEach(function(p){ $("pairStocks").appendChild(pairBtn(p)); });
+    function selectPair(p, btn){
+      state.pairSel = p;
+      document.querySelectorAll(".pair-opt").forEach(function(x){ x.classList.remove("active"); });
+      btn.classList.add("active");
+      $("fPair").classList.remove("invalid");
+      $("sumPair").textContent = p.sym+" · "+p.name;
+      $("sumMint").textContent = p.mint;
+      $("sumMint").title = p.mint;
+      var ibu = $("initBuyUnit"); if(ibu) ibu.textContent = p.sym;
+      $("pairNote").innerHTML = p.stock
+        ? "<b>"+p.sym+"</b> is a tokenized stock issued by Backed (xStocks), Token-2022 with 8 decimals. xStocks trade 24/7 on Solana DEXs — your pool stays open around the clock, even when US markets are closed. Note: xStocks are not available to US persons."
+        : "Your pool will be priced in "+p.name+" ("+p.sym+").";
+      updateDeployBtn();
+    }
+    /* default pair: SOL */
+    (function(){ var first = $("pairCrypto").querySelector(".pair-opt"); if(first) first.click(); })();
+
+    /* ---- Step 3: trading fee (1%–10%) ---- */
+    function fmtFeePct(v){ return (v % 1 ? v.toFixed(1) : String(v)) + "%"; }
+    function setFee(v){
+      v = Math.min(10, Math.max(1, v));
+      state.feePct = v;
+      $("feeVal").textContent = v % 1 ? v.toFixed(1) : String(v);
+      $("feeRange").value = v;
+      $("sumFee").textContent = fmtFeePct(v);
+      $("feeExample").textContent = "On a $1,000 trade, traders pay $" + (v*10).toLocaleString("en-US") + " in fees — split by your coin type.";
+      $("feeRow").querySelectorAll(".chip").forEach(function(x){
+        x.classList.toggle("active", parseFloat(x.getAttribute("data-fee")) === v);
+      });
+    }
+    $("feeRange").addEventListener("input", function(){ setFee(parseFloat(this.value)); });
+    $("feeRow").querySelectorAll(".chip").forEach(function(c){
+      c.addEventListener("click", function(){ setFee(parseFloat(c.getAttribute("data-fee"))); });
+    });
+
+    /* ---- Step 4: coin type ---- */
+    var TYPE_DEFS = {
+      vanilla: { name: "Vanilla",        split: { creator: 100, holders: 0,  buyback: 0 } },
+      holders: { name: "Holder Rewards", split: { creator: 50,  holders: 50, buyback: 0 } },
+      buyback: { name: "Buyback",        split: { creator: 0,   holders: 0,  buyback: 100 } },
+      custom:  { name: "Custom Mix",     split: null }
+    };
+    function currentSplit(){
+      if(state.coinType === "custom"){
+        return {
+          creator: parseFloat($("splitCreator").value) || 0,
+          holders: parseFloat($("splitHolders").value) || 0,
+          buyback: parseFloat($("splitBuyback").value) || 0
+        };
+      }
+      return TYPE_DEFS[state.coinType].split;
+    }
+    function splitText(s){
+      var parts = [];
+      if(s.creator > 0) parts.push("Payouts " + s.creator + "%");
+      if(s.holders > 0) parts.push("Holders " + s.holders + "%");
+      if(s.buyback > 0) parts.push("Buyback " + s.buyback + "%");
+      return parts.join(" · ") || "—";
+    }
+    $("typeGrid").querySelectorAll(".type-opt").forEach(function(b){
+      b.addEventListener("click", function(){
+        $("typeGrid").querySelectorAll(".type-opt").forEach(function(x){ x.classList.remove("active"); });
+        b.classList.add("active");
+        state.coinType = b.getAttribute("data-type");
+        $("customSplit").style.display = state.coinType === "custom" ? "" : "none";
+        $("customSplit").classList.remove("invalid");
+        $("sumType").textContent = TYPE_DEFS[state.coinType].name;
+        updateSplitTotal();
+        updatePayoutSummary();
+      });
+    });
+    ["splitCreator","splitHolders","splitBuyback"].forEach(function(id){
+      $(id).addEventListener("input", function(){
+        $("customSplit").classList.remove("invalid");
+        updateSplitTotal();
+        updatePayoutSummary();
+      });
+    });
+    function updateSplitTotal(){
+      if(state.coinType !== "custom") return;
+      var s = currentSplit(), tot = s.creator + s.holders + s.buyback;
+      $("splitTotal").textContent = "Total so far: " + tot + "% — must equal 100%.";
+      $("splitTotal").style.color = tot === 100 ? "var(--green)" : "var(--red)";
+    }
+
+    /* ---- Step 5: payout wallets (up to 10) ---- */
+    var ADDR_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+    function payoutRows(){ return Array.prototype.slice.call($("payoutList").querySelectorAll(".payout-row")); }
+    function addPayoutRow(addr, share){
+      if(payoutRows().length >= 10){ toast("Up to 10 payout wallets."); return; }
+      var row = el('<div class="payout-row">' +
+        '<input type="text" class="po-addr" placeholder="Solana wallet address" autocomplete="off" spellcheck="false" />' +
+        '<span class="po-share"><input type="number" class="po-share-in" min="0" max="100" step="1" /><span>%</span></span>' +
+        '<button type="button" class="po-del" aria-label="Remove recipient">×</button></div>');
+      if(addr) row.querySelector(".po-addr").value = addr;
+      if(share != null) row.querySelector(".po-share-in").value = share;
+      row.querySelector(".po-del").addEventListener("click", function(){
+        if(payoutRows().length <= 1){
+          row.querySelector(".po-addr").value = "";
+          row.querySelector(".po-share-in").value = "";
+        } else row.remove();
+        syncPayouts();
+      });
+      row.querySelectorAll("input").forEach(function(inp){ inp.addEventListener("input", syncPayouts); });
+      $("payoutList").appendChild(row);
+      syncPayouts();
+    }
+    function payoutData(){
+      return payoutRows().map(function(r){
+        return {
+          addr: r.querySelector(".po-addr").value.trim(),
+          share: parseFloat(r.querySelector(".po-share-in").value) || 0
+        };
+      }).filter(function(p){ return p.addr || p.share; });
+    }
+    function syncPayouts(){
+      $("payoutErr").style.display = "none";
+      var data = payoutData();
+      var tot = data.reduce(function(a, p){ return a + p.share; }, 0);
+      $("payoutTotal").textContent = data.length ? "Shares total: " + tot + "% of 100%" : "";
+      $("payoutTotal").style.color = (tot === 100 || currentSplit().creator === 0) ? "" : "var(--red)";
+      $("addPayoutBtn").disabled = payoutRows().length >= 10;
+      updatePayoutSummary();
+    }
+    function updatePayoutSummary(){
+      var n = payoutData().filter(function(p){ return p.addr; }).length;
+      $("sumPayouts").textContent = currentSplit().creator === 0
+        ? "None — 0% payout share"
+        : (n ? n + (n === 1 ? " wallet" : " wallets") : "Not set");
+    }
+    $("addPayoutBtn").addEventListener("click", function(){ addPayoutRow("", ""); });
+    function renderPayoutHint(){
+      var s = currentSplit();
+      $("payoutHint").textContent = s.creator === 0
+        ? "Your coin type sends 0% of fees to payout wallets, so you can skip this step — or add wallets now in case you switch to a mix with a payout share later."
+        : "The creator-payout share (" + s.creator + "% of all trading fees) is split between these Solana wallets by share. Add up to 10; shares must total 100%.";
+    }
+    $("inName").addEventListener("input", function(){
+      $("sumName").textContent = this.value.trim() || "—";
+      $("fName").classList.remove("invalid");
+    });
+    $("inTicker").addEventListener("input", function(){
+      this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g,"");
+      $("sumTicker").textContent = this.value ? "$"+this.value : "—";
+      $("fTicker").classList.remove("invalid");
+    });
+    $("inDesc").addEventListener("input", function(){ $("descCount").textContent = this.value.length; });
+    $("inImage").addEventListener("change", function(){
+      var f = this.files && this.files[0];
+      $("imgErr").textContent = "";
+      if(!f) return;
+      if(f.size > 5*1024*1024){ $("imgErr").textContent = "That image is over 5 MB — pick a smaller one."; this.value=""; return; }
+      var rd = new FileReader();
+      rd.onload = function(){
+        $("uploadPreview").innerHTML = '<img src="'+rd.result+'" alt="Token image preview" />';
+      };
+      rd.readAsDataURL(f);
+    });
+    /* ---- Wizard navigation & validation ---- */
+    var STEP_NAMES = { 1: "Identity", 2: "Pair", 3: "Trading fee", 4: "Coin type", 5: "Payouts", 6: "Review" };
+    function gotoStep(n){
+      state.step = n;
+      document.querySelectorAll(".step-pane").forEach(function(p){
+        p.classList.toggle("active", parseInt(p.getAttribute("data-step"), 10) === n);
+      });
+      $("stepBar").querySelectorAll("li").forEach(function(li){
+        var s = parseInt(li.getAttribute("data-goto"), 10);
+        li.classList.toggle("active", s === n);
+        li.classList.toggle("done", s < n);
+        li.querySelector(".n").textContent = s < n ? "✓" : String(s);
+      });
+      $("wizBack").style.visibility = n === 1 ? "hidden" : "visible";
+      $("wizNext").style.display = n === 6 ? "none" : "";
+      $("wizCount").textContent = "Step " + n + " of 6 · " + STEP_NAMES[n];
+      if(n === 5){ renderPayoutHint(); syncPayouts(); }
+      if(n === 6) renderReview();
+    }
+    function validateStep(n){
+      if(n === 1){
+        var ok = true;
+        var name = $("inName").value.trim();
+        if(name.length < 2 || name.length > 32){ $("fName").classList.add("invalid"); ok = false; }
+        var tick = $("inTicker").value.trim();
+        if(!/^[A-Z0-9]{2,10}$/.test(tick)){ $("fTicker").classList.add("invalid"); ok = false; }
+        return ok;
+      }
+      if(n === 2){
+        if(!state.pairSel){ $("fPair").classList.add("invalid"); return false; }
+        return true;
+      }
+      if(n === 3){ return state.feePct >= 1 && state.feePct <= 10; }
+      if(n === 4){
+        if(state.coinType !== "custom") return true;
+        var s = currentSplit();
+        var okc = (s.creator + s.holders + s.buyback) === 100;
+        $("customSplit").classList.toggle("invalid", !okc);
+        return okc;
+      }
+      if(n === 5){
+        if(currentSplit().creator <= 0){ $("payoutErr").style.display = "none"; return true; }
+        var data = payoutData(), err = "";
+        if(!data.length) err = "Add at least one payout wallet.";
+        else {
+          for(var i = 0; i < data.length; i++){
+            if(!ADDR_RE.test(data[i].addr)){ err = "Wallet " + (i + 1) + " doesn't look like a Solana address."; break; }
+            if(!(data[i].share > 0)){ err = "Every payout wallet needs a share above 0%."; break; }
+          }
+          if(!err){
+            var tot = data.reduce(function(a, p){ return a + p.share; }, 0);
+            if(tot !== 100) err = "Shares add up to " + tot + "% — they must total exactly 100%.";
+          }
+        }
+        $("payoutErr").textContent = err;
+        $("payoutErr").style.display = err ? "block" : "none";
+        return !err;
+      }
+      return true;
+    }
+    $("wizNext").addEventListener("click", function(){
+      if(!validateStep(state.step)){ toast("A couple of fields on this step need fixing."); return; }
+      gotoStep(Math.min(6, state.step + 1));
+      $("createForm").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    $("wizBack").addEventListener("click", function(){
+      gotoStep(Math.max(1, state.step - 1));
+      $("createForm").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    $("stepBar").querySelectorAll("li").forEach(function(li){
+      li.addEventListener("click", function(){
+        var target = parseInt(li.getAttribute("data-goto"), 10);
+        if(target === state.step) return;
+        if(target < state.step){ gotoStep(target); return; }
+        for(var s = state.step; s < target; s++){
+          if(!validateStep(s)){ gotoStep(s); toast("Finish this step first."); return; }
+        }
+        gotoStep(target);
+      });
+    });
+
+    /* ---- Step 6: review ---- */
+    function esc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+    function reviewRow(k, v, mono){
+      return '<div class="sum-row"><span class="k">' + k + '</span><span class="v' + (mono ? " mono" : "") + '">' + v + '</span></div>';
+    }
+    function renderReview(){
+      var name = $("inName").value.trim() || "—";
+      var tick = $("inTicker").value.trim();
+      var img = $("uploadPreview").querySelector("img");
+      var imgSrc = img ? img.getAttribute("src") : "assets/logo-rocket.webp";
+      var p = state.pairSel;
+      var s = currentSplit();
+      var data = payoutData().filter(function(x){ return x.addr; });
+      var init = parseFloat(($("inInitBuy").value || "").replace(/,/g, ""));
+      var h = '<div class="review-head"><img src="' + imgSrc + '" alt="Token image" />' +
+        '<div><div style="font-weight:800;font-size:19px;line-height:1.15">' + esc(name) + '</div>' +
+        '<div style="color:var(--muted);font-weight:700">' + (tick ? "$" + esc(tick) : "—") + ' · Solana mainnet</div></div></div>';
+      var desc = $("inDesc").value.trim();
+      if(desc) h += '<p style="color:var(--muted);font-size:14px;margin:2px 0 10px">' + esc(desc) + '</p>';
+      h += reviewRow("Total supply", "1,000,000,000 · 6 decimals");
+      h += reviewRow("Pair asset", p ? p.sym + " · " + p.name : "—");
+      if(p) h += reviewRow("Pair mint", p.mint, true);
+      h += reviewRow("Pool", "Raydium CPMM · routes via Jupiter");
+      h += reviewRow("Trading fee", fmtFeePct(state.feePct));
+      h += reviewRow("Coin type", TYPE_DEFS[state.coinType].name);
+      h += reviewRow("Fee split", splitText(s));
+      if(s.creator > 0){
+        if(data.length) data.forEach(function(x, i){ h += reviewRow("Payout " + (i + 1), truncAddr(x.addr) + " · " + x.share + "%", true); });
+        else h += reviewRow("Payouts", "Not set");
+      } else {
+        h += reviewRow("Payouts", "None — 0% payout share");
+      }
+      var web = $("inWebsite").value.trim(), xv = $("inX").value.trim(), tg = $("inTelegram").value.trim();
+      if(web) h += reviewRow("Website", esc(web));
+      if(xv) h += reviewRow("X", esc(xv));
+      if(tg) h += reviewRow("Telegram", esc(tg));
+      h += reviewRow("Initial purchase", (!isNaN(init) && init > 0) ? fmtTokens(init, 4) + " " + (p ? p.sym : "SOL") : "None");
+      h += reviewRow("Mint authority", "Revoked at launch");
+      $("reviewBox").innerHTML = h;
+      $("sumInit").textContent = (!isNaN(init) && init > 0 && p) ? fmtTokens(init, 4) + " " + p.sym : "None";
+    }
+    $("inInitBuy").addEventListener("input", function(){
+      var v = parseFloat((this.value || "").replace(/,/g, ""));
+      $("sumInit").textContent = (!isNaN(v) && v > 0 && state.pairSel) ? fmtTokens(v, 4) + " " + state.pairSel.sym : "None";
+    });
+
+    function updateDeployBtn(){
+      $("deployBtn").textContent = state.wallet ? "Review deployment" : "Connect wallet to deploy";
+    }
+    $("deployBtn").addEventListener("click", function(){
+      for(var s = 1; s <= 5; s++){
+        if(!validateStep(s)){
+          gotoStep(s);
+          toast("A couple of fields need fixing before you can deploy.");
+          return;
+        }
+      }
+      if(!state.wallet){ openWalletModal(); return; }
+      toast("Setup validated. Deployment switches on after this preview is approved — nothing was minted or signed.");
+    });
+
+    /* ---- Create wizard init ---- */
+    setFee(2);
+    addPayoutRow("", 100);
+    gotoStep(1);
+
+    /* ================= Boot ================= */
+    loadToken();
+    loadTicker();
+    setInterval(loadToken, 60000);
+    setInterval(loadTicker, 120000);
+    updateActionBtn();
+    })();
+    </script>
+  </body>
+</html>
