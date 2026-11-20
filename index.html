@@ -222,6 +222,22 @@
       html[data-theme="dark"] .chip.active{background:#f4f4f6;color:#0d0d10;border-color:#f4f4f6}
       .note-line{font-size:12.5px;color:var(--muted);margin-top:12px;line-height:1.5}
 
+      /* ---------- Network toggle & tx status ---------- */
+      .net-seg button{display:inline-flex;align-items:center;gap:6px}
+      .net-seg .ndot{width:7px;height:7px;border-radius:50%;background:var(--green);flex:none}
+      .net-seg button.dev .ndot{background:#d97706}
+      .tx-status{display:none;margin-top:14px;border:1px solid var(--border);border-radius:12px;padding:13px 14px;background:var(--surface-2);font-size:13.5px;line-height:1.55}
+      .tx-status.show{display:block}
+      .tx-status .st-title{font-weight:800;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+      .tx-status .st-line{margin:5px 0;color:var(--text);word-break:break-word}
+      .tx-status .st-line.mut{color:var(--muted)}
+      .tx-status .st-sum{font-weight:700;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:8px 11px;margin:8px 0;word-break:break-word}
+      .tx-status .st-err{color:var(--red);font-weight:600;word-break:break-word}
+      .tx-status .st-ok{color:var(--green);font-weight:700}
+      .tx-status a{color:#4f46e5;font-weight:700}
+      html[data-theme="dark"] .tx-status a{color:#a5b4fc}
+      @media (max-width:680px){ .net-seg button{padding:0 8px;font-size:12.5px;height:30px} }
+
       /* ---------- Create ---------- */
       .create-grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;align-items:start}
       .field{margin-bottom:18px}
@@ -363,12 +379,16 @@
       <div class="wrap header-in">
         <a class="brand" href="#" data-nav="explore" aria-label="GTA 6 Launchpad home">
           <img src="assets/logo-rocket.webp" alt="GTA 6 Launchpad rocket emblem" />
-          <span class="brand-txt">GTA 6 Launchpad<span class="brand-sub">Solana · Mainnet</span></span>
+          <span class="brand-txt">GTA 6 Launchpad<span class="brand-sub" id="brandNet">Solana · Mainnet</span></span>
         </a>
         <nav class="main" aria-label="Main">
           <button type="button" data-nav="explore" class="active" id="navExplore">Explore</button>
           <button type="button" data-nav="create" id="navCreate">Create</button>
         </nav>
+        <span class="seg net-seg" role="group" aria-label="Network">
+          <button type="button" id="netMainnet" class="active"><span class="ndot"></span>Mainnet</button>
+          <button type="button" id="netDevnet" class="dev"><span class="ndot"></span>Devnet</button>
+        </span>
         <div class="header-spacer"></div>
         <label class="search-box">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
@@ -615,6 +635,8 @@
             <div class="quote-meta"><span>Minimum received</span><span class="num" id="qMin">—</span></div>
             <div class="quote-meta"><span>Route</span><span id="qRoute">—</span></div>
             <button type="button" class="action-btn connect" id="actionBtn">Connect wallet to buy</button>
+            <div class="tx-status" id="swapStatus"></div>
+            <p class="note-line" id="devnetNote" style="display:none">Devnet aktif: GTA6L belum punya pool di devnet — token ini hanya ada di mainnet, jadi swap devnet untuk GTA6L nggak tersedia. Swap devnet jalan langsung lewat pool Raydium CPMM untuk token yang dibuat di devnet lewat halaman Create.</p>
 
             <div class="panel-sec">
               <div class="sec-title">Quick buy · SOL</div>
@@ -631,8 +653,8 @@
             <div class="panel-sec">
               <div class="sec-title">Slippage</div>
               <div class="chip-row" id="slipRow">
-                <button type="button" class="chip" data-slip="50">0.5%</button>
-                <button type="button" class="chip active" data-slip="100">1%</button>
+                <button type="button" class="chip active" data-slip="50">0.5%</button>
+                <button type="button" class="chip" data-slip="100">1%</button>
                 <button type="button" class="chip" data-slip="200">2%</button>
                 <button type="button" class="chip" data-slip="500">5%</button>
               </div>
@@ -721,6 +743,16 @@
               <div class="hint" id="pairNote" style="margin-top:10px"></div>
               <div class="err">Pick a pair asset.</div>
             </div>
+            <div class="field" id="fSeed">
+              <label>Seed liquidity</label>
+              <div class="hint" style="margin:0 0 10px">The pool opens with these two deposits — their ratio sets the opening price. Your full 1B supply is minted to your wallet first; only the seed amount goes into the pool, the rest stays in your wallet.</div>
+              <div class="split-grid" style="grid-template-columns:1fr 1fr">
+                <div><span class="split-lbl">Your token amount</span><span class="split-in"><input type="text" inputmode="decimal" id="seedTokenAmt" value="100,000,000" autocomplete="off" /></span></div>
+                <div><span class="split-lbl">Pair asset amount</span><span class="split-in"><input type="text" inputmode="decimal" id="seedPairAmt" value="1" autocomplete="off" /><span id="seedPairUnit">SOL</span></span></div>
+              </div>
+              <div class="hint" id="seedHint" style="margin-top:8px"></div>
+              <div class="err">Enter a token seed above 0 (max 1,000,000,000) and a pair-asset seed above 0.</div>
+            </div>
             </div>
 
             <div class="step-pane" data-step="3">
@@ -799,16 +831,9 @@
               <div class="hint" style="margin:0">Check everything below — this is exactly what gets deployed on Solana.</div>
             </div>
             <div id="reviewBox"></div>
-            <div class="field" style="margin-top:20px">
-              <label for="inInitBuy">Initial purchase <span style="color:var(--faint);font-weight:600">(optional)</span></label>
-              <div class="initbuy-row">
-                <input type="text" inputmode="decimal" id="inInitBuy" placeholder="0.0" autocomplete="off" />
-                <span class="unit" id="initBuyUnit">SOL</span>
-              </div>
-              <div class="hint">Buy your own coin in the same transaction that deploys it, so you hold the first position. Leave at 0 to just deploy.</div>
-            </div>
             <button type="button" class="btn btn-grad deploy-btn" id="deployBtn">Connect wallet to deploy</button>
-            <p class="note-line" id="deployNote">This preview validates your setup and shows the full deployment summary. On-chain deployment is switched on after review — nothing is minted or signed from this page yet.</p>
+            <div class="tx-status" id="deployStatus"></div>
+            <p class="note-line" id="deployNote">Deployment runs two transactions from your wallet: (1) create the Token-2022 mint, mint the full 1B supply to you, and revoke the mint authority; (2) open the Raydium CPMM pool with your seed liquidity (pool creation costs ~0.19 SOL on mainnet; devnet uses test SOL). Every transaction is simulated first — if simulation fails, nothing is sent. LP tokens go to your wallet and are <b>not</b> auto-locked.</p>
             </div>
 
             <div class="wiz-nav">
@@ -820,7 +845,7 @@
 
           <div class="card summary-card">
             <h3>Deployment summary</h3>
-            <div class="sum-row"><span class="k">Network</span><span class="v">Solana mainnet</span></div>
+            <div class="sum-row"><span class="k">Network</span><span class="v" id="sumNetwork">Solana mainnet</span></div>
             <div class="sum-row"><span class="k">Token name</span><span class="v" id="sumName">—</span></div>
             <div class="sum-row"><span class="k">Ticker</span><span class="v" id="sumTicker">—</span></div>
             <div class="sum-row"><span class="k">Total supply</span><span class="v num">1,000,000,000</span></div>
@@ -831,7 +856,7 @@
             <div class="sum-row"><span class="k">Trading fee</span><span class="v" id="sumFee">2%</span></div>
             <div class="sum-row"><span class="k">Coin type</span><span class="v" id="sumType">Vanilla</span></div>
             <div class="sum-row"><span class="k">Payouts</span><span class="v" id="sumPayouts">Not set</span></div>
-            <div class="sum-row"><span class="k">Initial purchase</span><span class="v" id="sumInit">None</span></div>
+            <div class="sum-row"><span class="k">Seed liquidity</span><span class="v" id="sumInit">None</span></div>
             <div class="sum-row"><span class="k">Mint authority</span><span class="v">Revoked at launch</span></div>
             <p class="note-line">Six steps: identity, pair, fee, coin type, payouts, then review &amp; deploy. This card tracks your choices as you go.</p>
           </div>
@@ -868,14 +893,23 @@
 
     <div class="toast" id="toast" role="status"></div>
 
+    <script src="assets/solana-stack.js"></script>
     <script>
     "use strict";
     (function(){
     /* ================= Constants ================= */
     var GTA6L_MINT = "71dBaVmZcGC2ShnnFWHrgFVMsgRe7dRR8icCWjJkpump";
     var SOL_MINT = "So11111111111111111111111111111111111111112";
-    var USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
-    var RPC = "https://api.mainnet-beta.solana.com";
+    var TOKEN_PROG = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+    var TOKEN22_PROG = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
+    /* Live devnet CPMM program (its config PDA idx0 matches the Raydium devnet API);
+       the SDK 0.1.x DEVNET_PROGRAM_ID entry is stale, so devnet uses this address. */
+    var DEVNET_CPMM_PROGRAM = "DRaycpLY18LhpbydsBWbVJtxpNv9oXPgjRSfpF2bWpYb";
+    var TOTAL_SUPPLY_RAW = "1000000000000000"; /* 1,000,000,000 tokens × 10^6 */
+    var NETWORKS = {
+      mainnet: { key:"mainnet", label:"Mainnet", rpc:"https://solana-rpc.publicnode.com", rpcFallback:"https://api.mainnet-beta.solana.com", usdc:"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", clusterParam:"" },
+      devnet: { key:"devnet", label:"Devnet", rpc:"https://api.devnet.solana.com", rpcFallback:"https://api.devnet.solana.com", usdc:"4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU", clusterParam:"?cluster=devnet" }
+    };
     var STOCKS = [
       {sym:"NVDAx", name:"NVIDIA", mint:"Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh"},
       {sym:"TSLAx", name:"Tesla", mint:"XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB"},
@@ -887,10 +921,13 @@
       {sym:"QQQx", name:"Nasdaq-100 ETF", mint:"Xs8S1uUs1zvS2p7iwtsG3b6fkhpvmwz4GYU3gWAmWHZ"},
       {sym:"SPCXx", name:"SpaceX", mint:"Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8"}
     ];
-    var PAIRS = [
-      {sym:"SOL", name:"Solana", mint:SOL_MINT, stock:false},
-      {sym:"USDC", name:"USD Coin", mint:USDC_MINT, stock:false}
-    ].concat(STOCKS.map(function(s){ return {sym:s.sym, name:s.name, mint:s.mint, stock:true}; }));
+    function buildPairs(net){
+      return [
+        {sym:"SOL", name:"Solana", mint:SOL_MINT, stock:false, decimals:9, programId:TOKEN_PROG},
+        {sym:"USDC", name:"USD Coin", mint:NETWORKS[net].usdc, stock:false, decimals:6, programId:TOKEN_PROG}
+      ].concat(STOCKS.map(function(s){ return {sym:s.sym, name:s.name, mint:s.mint, stock:true, decimals:8, programId:TOKEN22_PROG}; }));
+    }
+    var PAIRS = buildPairs("mainnet");
 
     /* ================= State ================= */
     var state = {
@@ -898,11 +935,14 @@
       spark: [],             // closes for sparkline
       wallet: null,          // {provider, pubkey}
       solBal: null, gtaBal: null,
-      side: "buy", slippage: 100,
+      side: "buy", slippage: 50,
       tf: "1h", chartType: "candle", candles: [],
       tab: "all", viewMode: "table", watched: false,
       pairSel: null, feePct: 2, step: 1, coinType: "vanilla",
-      quoteTimer: null, quoteSeq: 0
+      quoteTimer: null, quoteSeq: 0,
+      network: "mainnet", quote: null,
+      connection: null, connectionNet: null, raydium: null, raydiumKey: null,
+      tokenPools: {}, deploying: false, swapping: false
     };
 
     function $(id){ return document.getElementById(id); }
@@ -1288,6 +1328,36 @@
       applyFilters();
     }
 
+    /* ================= Network toggle ================= */
+    function explorerTx(sig){ return "https://solscan.io/tx/" + sig + NETWORKS[state.network].clusterParam; }
+    function explorerAddr(addr){ return "https://solscan.io/account/" + addr + NETWORKS[state.network].clusterParam; }
+    function setNetwork(net){
+      if(state.network !== net){
+        state.network = net;
+        state.connection = null; state.raydium = null; state.raydiumKey = null;
+        state.quote = null;
+        PAIRS = buildPairs(net);
+        renderPairs();
+        if(state.wallet) loadBalances();
+        refreshQuote();
+        toast(net === "devnet"
+          ? "Devnet — test network. Transactions use test SOL, no real funds."
+          : "Mainnet — real funds. Every transaction is simulated before you sign.");
+      }
+      syncNetworkUI();
+    }
+    function syncNetworkUI(){
+      var isMain = state.network === "mainnet";
+      $("netMainnet").classList.toggle("active", isMain);
+      $("netDevnet").classList.toggle("active", !isMain);
+      $("brandNet").textContent = "Solana · " + NETWORKS[state.network].label;
+      var sn = $("sumNetwork"); if(sn) sn.textContent = "Solana " + state.network;
+      $("devnetNote").style.display = isMain ? "none" : "block";
+      updateActionBtn();
+    }
+    $("netMainnet").addEventListener("click", function(){ setNetwork("mainnet"); });
+    $("netDevnet").addEventListener("click", function(){ setNetwork("devnet"); });
+
     /* ================= Wallet ================= */
     function getProvider(kind){
       if(kind==="phantom"){
@@ -1363,7 +1433,7 @@
       updateActionBtn(); updateBalText(); updateDeployBtn();
     }
     function rpc(method, params){
-      return fetch(RPC, {method:"POST", headers:{"Content-Type":"application/json"},
+      return fetch(NETWORKS[state.network].rpc, {method:"POST", headers:{"Content-Type":"application/json"},
         body: JSON.stringify({jsonrpc:"2.0", id:1, method:method, params:params})})
         .then(function(r){ return r.json(); });
     }
@@ -1410,6 +1480,9 @@
       if(!state.wallet){
         b.classList.add("connect");
         b.textContent = state.side==="buy" ? "Connect wallet to buy" : "Connect wallet to sell";
+      } else if(state.network==="devnet" && !devnetPoolFor(GTA6L_MINT)){
+        b.classList.add("connect");
+        b.textContent = "No devnet pool for GTA6L";
       } else {
         b.classList.add(state.side);
         b.textContent = state.side==="buy" ? "Buy GTA6L" : "Sell GTA6L";
@@ -1417,7 +1490,7 @@
     }
     $("actionBtn").addEventListener("click", function(){
       if(!state.wallet){ openWalletModal(); return; }
-      toast("Quotes are live for review — swap execution is switched on after this preview is approved. Nothing was signed.");
+      executeSwap();
     });
     $("quickBuyRow").querySelectorAll(".chip").forEach(function(c){
       c.addEventListener("click", function(){
@@ -1450,10 +1523,21 @@
       clearTimeout(state.quoteTimer);
       state.quoteTimer = setTimeout(refreshQuote, 400);
     });
+    function renderDevnetQuote(){
+      state.quote = null;
+      var poolId = devnetPoolFor(GTA6L_MINT);
+      $("recvAmt").textContent = "—";
+      $("qImpact").textContent = "—"; $("qMin").textContent = "—";
+      $("qRoute").textContent = poolId ? "Raydium CPMM (devnet)" : "No devnet pool";
+      $("amtUsd").textContent = "≈ —";
+      updateActionBtn();
+    }
     function refreshQuote(){
+      if(state.network === "devnet"){ renderDevnetQuote(); return; }
       var raw = parseFloat(($("amtInput").value||"").replace(/,/g,""));
       var price = state.pair ? parseFloat(state.pair.priceUsd) : null;
       if(isNaN(raw) || raw<=0){
+        state.quote = null;
         $("recvAmt").textContent = "—"; $("qImpact").textContent="—"; $("qMin").textContent="—"; $("qRoute").textContent="—";
         $("amtUsd").textContent = "≈ —"; return;
       }
@@ -1472,6 +1556,8 @@
         "&amount="+amount+"&slippageBps="+state.slippage;
       fetchJSON(url).then(function(q){
         if(seq!==state.quoteSeq) return;
+        state.quote = q;
+        state.quoteFor = { amount: amount, side: state.side, slippage: state.slippage };
         var out = parseFloat(q.outAmount) / (state.side==="buy" ? 1e6 : 1e9);
         $("recvAmt").textContent = fmtTokens(out, state.side==="buy"?0:4)+" "+(state.side==="buy"?"GTA6L":"SOL");
         var min = parseFloat(q.otherAmountThreshold) / (state.side==="buy" ? 1e6 : 1e9);
@@ -1482,6 +1568,7 @@
         if(state.side==="buy" && q.swapUsdValue) $("amtUsd").textContent = "≈ "+fmtUSD(parseFloat(q.swapUsdValue));
       }).catch(function(){
         if(seq!==state.quoteSeq) return;
+        state.quote = null;
         $("recvAmt").textContent = "No route";
         $("qImpact").textContent="—"; $("qMin").textContent="—"; $("qRoute").textContent="—";
       });
@@ -1501,8 +1588,17 @@
       b.addEventListener("click", function(){ selectPair(p, b); });
       return b;
     }
-    PAIRS.slice(0,2).forEach(function(p){ $("pairCrypto").appendChild(pairBtn(p)); });
-    PAIRS.slice(2).forEach(function(p){ $("pairStocks").appendChild(pairBtn(p)); });
+    function renderPairs(){
+      var prevSym = state.pairSel ? state.pairSel.sym : "SOL";
+      $("pairCrypto").innerHTML = ""; $("pairStocks").innerHTML = "";
+      PAIRS.slice(0,2).forEach(function(p){ $("pairCrypto").appendChild(pairBtn(p)); });
+      PAIRS.slice(2).forEach(function(p){ $("pairStocks").appendChild(pairBtn(p)); });
+      var target = PAIRS[0];
+      PAIRS.forEach(function(p){ if(p.sym === prevSym) target = p; });
+      document.querySelectorAll(".pair-opt").forEach(function(b){
+        if(b.getAttribute("data-sym") === target.sym) selectPair(target, b);
+      });
+    }
     function selectPair(p, btn){
       state.pairSel = p;
       document.querySelectorAll(".pair-opt").forEach(function(x){ x.classList.remove("active"); });
@@ -1511,14 +1607,31 @@
       $("sumPair").textContent = p.sym+" · "+p.name;
       $("sumMint").textContent = p.mint;
       $("sumMint").title = p.mint;
-      var ibu = $("initBuyUnit"); if(ibu) ibu.textContent = p.sym;
+      var spu = $("seedPairUnit"); if(spu) spu.textContent = p.sym;
       $("pairNote").innerHTML = p.stock
-        ? "<b>"+p.sym+"</b> is a tokenized stock issued by Backed (xStocks), Token-2022 with 8 decimals. xStocks trade 24/7 on Solana DEXs — your pool stays open around the clock, even when US markets are closed. Note: xStocks are not available to US persons."
-        : "Your pool will be priced in "+p.name+" ("+p.sym+").";
+        ? "Pairing dengan xStock tersedia — mint ini sudah terdaftar di Raydium (transfer hook sudah diizinkan). <b>" + p.sym + "</b> is a tokenized stock issued by Backed (xStocks), Token-2022 with 8 decimals, trading 24/7 on Solana DEXs — your pool stays open around the clock, even when US markets are closed. Note: xStocks are not available to US persons."
+        : "Your pool will be priced in " + p.name + " (" + p.sym + ").";
+      updateSeedSummary();
       updateDeployBtn();
     }
-    /* default pair: SOL */
-    (function(){ var first = $("pairCrypto").querySelector(".pair-opt"); if(first) first.click(); })();
+    /* pair picker (re)built for the active network */
+    renderPairs();
+
+    /* ---- Step 2: seed liquidity ---- */
+    function parseAmtStr(v){ return parseFloat(String(v == null ? "" : v).replace(/,/g, "")); }
+    function updateSeedSummary(){
+      var st = parseAmtStr($("seedTokenAmt").value), sp = parseAmtStr($("seedPairAmt").value);
+      var tick = $("inTicker").value.trim();
+      if(state.pairSel && !isNaN(st) && st > 0 && !isNaN(sp) && sp > 0){
+        $("sumInit").textContent = fmtTokens(st, 0) + " " + (tick || "TOKEN") + " + " + fmtTokens(sp, 4) + " " + state.pairSel.sym;
+        $("seedHint").textContent = "Opening price ≈ " + fmtTokens(sp / st, 8) + " " + state.pairSel.sym + " per token. Pool creation costs ~0.19 SOL in Raydium fees + rent on mainnet (devnet uses test SOL).";
+      } else {
+        $("sumInit").textContent = "Not set";
+        $("seedHint").textContent = "";
+      }
+    }
+    $("seedTokenAmt").addEventListener("input", function(){ $("fSeed").classList.remove("invalid"); updateSeedSummary(); });
+    $("seedPairAmt").addEventListener("input", function(){ $("fSeed").classList.remove("invalid"); updateSeedSummary(); });
 
     /* ---- Step 3: trading fee (1%–10%) ---- */
     function fmtFeePct(v){ return (v % 1 ? v.toFixed(1) : String(v)) + "%"; }
@@ -1648,6 +1761,7 @@
       this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g,"");
       $("sumTicker").textContent = this.value ? "$"+this.value : "—";
       $("fTicker").classList.remove("invalid");
+      updateSeedSummary();
     });
     $("inDesc").addEventListener("input", function(){ $("descCount").textContent = this.value.length; });
     $("inImage").addEventListener("change", function(){
@@ -1691,7 +1805,10 @@
       }
       if(n === 2){
         if(!state.pairSel){ $("fPair").classList.add("invalid"); return false; }
-        return true;
+        var st = parseAmtStr($("seedTokenAmt").value), sp = parseAmtStr($("seedPairAmt").value);
+        var okSeed = !isNaN(st) && st > 0 && st <= 1000000000 && !isNaN(sp) && sp > 0;
+        $("fSeed").classList.toggle("invalid", !okSeed);
+        return okSeed;
       }
       if(n === 3){ return state.feePct >= 1 && state.feePct <= 10; }
       if(n === 4){
@@ -1755,12 +1872,12 @@
       var p = state.pairSel;
       var s = currentSplit();
       var data = payoutData().filter(function(x){ return x.addr; });
-      var init = parseFloat(($("inInitBuy").value || "").replace(/,/g, ""));
       var h = '<div class="review-head"><img src="' + imgSrc + '" alt="Token image" />' +
         '<div><div style="font-weight:800;font-size:19px;line-height:1.15">' + esc(name) + '</div>' +
-        '<div style="color:var(--muted);font-weight:700">' + (tick ? "$" + esc(tick) : "—") + ' · Solana mainnet</div></div></div>';
+        '<div style="color:var(--muted);font-weight:700">' + (tick ? "$" + esc(tick) : "—") + ' · Solana ' + state.network + '</div></div></div>';
       var desc = $("inDesc").value.trim();
       if(desc) h += '<p style="color:var(--muted);font-size:14px;margin:2px 0 10px">' + esc(desc) + '</p>';
+      h += reviewRow("Network", "Solana " + state.network);
       h += reviewRow("Total supply", "1,000,000,000 · 6 decimals");
       h += reviewRow("Pair asset", p ? p.sym + " · " + p.name : "—");
       if(p) h += reviewRow("Pair mint", p.mint, true);
@@ -1778,18 +1895,19 @@
       if(web) h += reviewRow("Website", esc(web));
       if(xv) h += reviewRow("X", esc(xv));
       if(tg) h += reviewRow("Telegram", esc(tg));
-      h += reviewRow("Initial purchase", (!isNaN(init) && init > 0) ? fmtTokens(init, 4) + " " + (p ? p.sym : "SOL") : "None");
+      var stR = parseAmtStr($("seedTokenAmt").value), spR = parseAmtStr($("seedPairAmt").value);
+      h += reviewRow("Seed liquidity", fmtTokens(stR, 0) + " " + (tick || "TOKEN") + " + " + fmtTokens(spR, 4) + " " + (p ? p.sym : ""));
+      h += reviewRow("Pool fee config", "Raydium CPMM · 0.25% trade fee (config #0)");
+      h += reviewRow("Est. total cost", "≈ 0.20 SOL (mint ~0.0035 + pool ~0.19 + network fees)");
       h += reviewRow("Mint authority", "Revoked at launch");
       $("reviewBox").innerHTML = h;
-      $("sumInit").textContent = (!isNaN(init) && init > 0 && p) ? fmtTokens(init, 4) + " " + p.sym : "None";
+      updateSeedSummary();
     }
-    $("inInitBuy").addEventListener("input", function(){
-      var v = parseFloat((this.value || "").replace(/,/g, ""));
-      $("sumInit").textContent = (!isNaN(v) && v > 0 && state.pairSel) ? fmtTokens(v, 4) + " " + state.pairSel.sym : "None";
-    });
 
     function updateDeployBtn(){
-      $("deployBtn").textContent = state.wallet ? "Review deployment" : "Connect wallet to deploy";
+      var btn = $("deployBtn");
+      if(state.deploying){ btn.textContent = "Deploying…"; return; }
+      btn.textContent = state.wallet ? "Deploy token & open pool" : "Connect wallet to deploy";
     }
     $("deployBtn").addEventListener("click", function(){
       for(var s = 1; s <= 5; s++){
@@ -1800,8 +1918,310 @@
         }
       }
       if(!state.wallet){ openWalletModal(); return; }
-      toast("Setup validated. Deployment switches on after this preview is approved — nothing was minted or signed.");
+      runDeploy();
     });
+
+    /* ================= Solana engine (real transactions) =================
+       Hard rules: every transaction is simulated before it is sent; any
+       simulation failure stops the flow and shows the error. Nothing is
+       signed or broadcast without the user pressing the action button and
+       confirming in their own wallet. Amounts are always exact. */
+    function stack(){ return window.SolanaStack || null; }
+    function getConnection(){
+      var S = stack();
+      if(!state.connection || state.connectionNet !== state.network){
+        state.connection = new S.web3.Connection(NETWORKS[state.network].rpc, "confirmed");
+        state.connectionNet = state.network;
+      }
+      return state.connection;
+    }
+    function b64ToBytes(b64){
+      var bin = atob(b64), arr = new Uint8Array(bin.length);
+      for(var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      return arr;
+    }
+    function toRawStr(human, decimals){
+      var str = String(human == null ? "" : human).replace(/,/g, "").trim();
+      if(!/^\d*(\.\d*)?$/.test(str) || str === "" || str === ".") return null;
+      var parts = str.split("."), whole = parts[0] || "0", frac = parts[1] || "";
+      if(frac.length > decimals) return null;
+      while(frac.length < decimals) frac += "0";
+      return (whole + frac).replace(/^0+(?=\d)/, "");
+    }
+    function simulateTx(conn, tx){
+      return conn.simulateTransaction(tx).then(function(res){
+        if(res.value.err){
+          var logs = (res.value.logs || []).slice(-4).join(" | ");
+          throw new Error("Simulation failed: " + JSON.stringify(res.value.err) + (logs ? " — " + logs : ""));
+        }
+        return res.value;
+      });
+    }
+    /* Raydium SDK sends through these callbacks: simulate every transaction
+       first; only if all simulations pass does the wallet get asked to sign. */
+    function simulateThenSignAll(txs){
+      var conn = getConnection();
+      var chain = Promise.resolve();
+      txs.forEach(function(tx){
+        chain = chain.then(function(){ return simulateTx(conn, tx); });
+      });
+      return chain.then(function(){ return state.wallet.provider.signAllTransactions(txs); });
+    }
+    function loadRaydium(conn, owner){
+      var S = stack();
+      var key = state.network + ":" + state.wallet.pubkey;
+      if(state.raydium && state.raydiumKey === key) return Promise.resolve(state.raydium);
+      var isDev = state.network === "devnet";
+      return S.raydium.Raydium.load({
+        connection: conn,
+        owner: owner,
+        cluster: isDev ? "devnet" : "mainnet",
+        /* SDK 0.1.x does not switch its REST host by cluster alone — point it at the devnet API explicitly. */
+        urlConfigs: isDev ? { BASE_HOST: "https://api-v3-devnet.raydium.io" } : undefined,
+        disableFeatureCheck: true,
+        disableLoadToken: true,
+        signAllTransactions: simulateThenSignAll,
+        signTransaction: function(tx){
+          return simulateThenSignAll([tx]).then(function(r){ return r[0]; });
+        }
+      }).then(function(r){ state.raydium = r; state.raydiumKey = key; return r; });
+    }
+    function statusBox(box, title){
+      box.classList.add("show");
+      box.innerHTML = '<div class="st-title">' + title + '</div>';
+    }
+    function statusLine(box, html, cls){
+      var d = document.createElement("div");
+      d.className = "st-line" + (cls ? " " + cls : "");
+      d.innerHTML = html;
+      box.appendChild(d);
+      return d;
+    }
+    function summaryLine(box, text){
+      var d = document.createElement("div");
+      d.className = "st-sum";
+      d.textContent = text;
+      box.appendChild(d);
+      return d;
+    }
+    function shortErr(e){
+      var m = (e && e.message) ? e.message : String(e);
+      return m.length > 420 ? m.slice(0, 420) + "…" : m;
+    }
+
+    /* ================= Deploy: mint + Raydium CPMM pool ================= */
+    async function runDeploy(){
+      if(state.deploying) return;
+      var S = stack();
+      if(!S){ toast("Solana libraries are still loading — try again in a second."); return; }
+      var w3 = S.web3, spl = S.splToken, BN = S.BN;
+      var net = NETWORKS[state.network];
+      var p = state.pairSel;
+      var tick = $("inTicker").value.trim();
+      var name = $("inName").value.trim();
+      var seedTokenRaw = toRawStr($("seedTokenAmt").value, 6);
+      var seedPairRaw = toRawStr($("seedPairAmt").value, p.decimals);
+      if(!seedTokenRaw || seedTokenRaw === "0" || !seedPairRaw || seedPairRaw === "0"){
+        toast("Seed amounts need fixing — check step 2."); gotoStep(2); return;
+      }
+      var conn = getConnection();
+      var owner = new w3.PublicKey(state.wallet.pubkey);
+      var box = $("deployStatus");
+      var btn = $("deployBtn");
+      state.deploying = true;
+      btn.disabled = true; btn.textContent = "Deploying…";
+      statusBox(box, "Deployment · Solana " + state.network);
+      try {
+        /* ----- Pre-flight balance checks (fail before any transaction) ----- */
+        var balLamports = await conn.getBalance(owner);
+        if(p.sym === "SOL"){
+          var needLamports = Number(seedPairRaw) + 210000000;
+          if(balLamports < needLamports) throw new Error("Not enough SOL on " + state.network + ": the seed plus ~0.21 SOL of creation costs needs ≈ " + (needLamports / 1e9).toFixed(3) + " SOL, but your wallet holds " + (balLamports / 1e9).toFixed(4) + " SOL.");
+        } else {
+          if(balLamports < 210000000) throw new Error("Not enough SOL on " + state.network + " for creation costs (~0.21 SOL): your wallet holds " + (balLamports / 1e9).toFixed(4) + " SOL.");
+          var pairAta = spl.getAssociatedTokenAddressSync(new w3.PublicKey(p.mint), owner, false, new w3.PublicKey(p.programId));
+          var pairBal = await conn.getTokenAccountBalance(pairAta).catch(function(){ return null; });
+          if(!pairBal || !pairBal.value || BigInt(pairBal.value.amount) < BigInt(seedPairRaw)){
+            throw new Error("Not enough " + p.sym + " on " + state.network + ": your wallet holds " + (pairBal && pairBal.value ? pairBal.value.uiAmountString : "0") + " " + p.sym + ", but the seed needs " + fmtTokens(parseAmtStr($("seedPairAmt").value), 4) + " " + p.sym + ".");
+          }
+        }
+
+        /* ----- Tx 1: create Token-2022 mint, mint 1B, revoke mint authority ----- */
+        statusLine(box, '<span class="spin"></span> Building transaction 1 of 2 — create mint…', "mut");
+        var mintKp = w3.Keypair.generate();
+        var mintPk = mintKp.publicKey;
+        var rent = await conn.getMinimumBalanceForRentExemption(spl.MINT_SIZE);
+        var ata = spl.getAssociatedTokenAddressSync(mintPk, owner, false, spl.TOKEN_2022_PROGRAM_ID);
+        var tx1 = new w3.Transaction();
+        tx1.add(w3.SystemProgram.createAccount({ fromPubkey: owner, newAccountPubkey: mintPk, space: spl.MINT_SIZE, lamports: rent, programId: spl.TOKEN_2022_PROGRAM_ID }));
+        tx1.add(spl.createInitializeMint2Instruction(mintPk, 6, owner, null, spl.TOKEN_2022_PROGRAM_ID));
+        tx1.add(spl.createAssociatedTokenAccountInstruction(owner, ata, owner, mintPk, spl.TOKEN_2022_PROGRAM_ID));
+        tx1.add(spl.createMintToInstruction(mintPk, ata, owner, BigInt(TOTAL_SUPPLY_RAW), [], spl.TOKEN_2022_PROGRAM_ID));
+        tx1.add(spl.createSetAuthorityInstruction(mintPk, owner, spl.AuthorityType.MintTokens, null, [], spl.TOKEN_2022_PROGRAM_ID));
+        var bh1 = await conn.getLatestBlockhash("confirmed");
+        tx1.recentBlockhash = bh1.blockhash;
+        tx1.feePayer = owner;
+        tx1.partialSign(mintKp);
+        summaryLine(box, net.label + " · From " + truncAddr(state.wallet.pubkey) + " · Create Token-2022 mint $" + tick + " · Supply 1,000,000,000 · Mint authority revoked in the same tx · Est. cost ~0.0035 SOL");
+        statusLine(box, "Simulating transaction 1…", "mut");
+        await simulateTx(conn, tx1);
+        statusLine(box, "Simulation OK. Confirm in your wallet…", "mut");
+        var signed1 = await state.wallet.provider.signTransaction(tx1);
+        var sig1 = await conn.sendRawTransaction(signed1.serialize(), { skipPreflight: false, preflightCommitment: "confirmed" });
+        await conn.confirmTransaction({ signature: sig1, blockhash: bh1.blockhash, lastValidBlockHeight: bh1.lastValidBlockHeight }, "confirmed");
+        statusLine(box, '<span class="st-ok">Mint created:</span> ' + mintPk.toBase58() + ' · <a href="' + explorerAddr(mintPk.toBase58()) + '" target="_blank" rel="noopener">Solscan</a> · <a href="' + explorerTx(sig1) + '" target="_blank" rel="noopener">tx</a>');
+        var mintInfo = await spl.getMint(conn, mintPk, "confirmed", spl.TOKEN_2022_PROGRAM_ID);
+        if(mintInfo.mintAuthority !== null || mintInfo.freezeAuthority !== null || mintInfo.supply !== BigInt(TOTAL_SUPPLY_RAW) || mintInfo.decimals !== 6){
+          throw new Error("Mint verification failed (authority / supply / decimals mismatch) — pool creation stopped. Mint: " + mintPk.toBase58());
+        }
+        statusLine(box, "Verified on-chain: supply 1,000,000,000 · 6 decimals · mint &amp; freeze authority gone.", "mut");
+
+        /* ----- Tx 2: Raydium CPMM pool vs the chosen pair asset ----- */
+        statusLine(box, '<span class="spin"></span> Building transaction 2 of 2 — Raydium CPMM pool…', "mut");
+        var raydium = await loadRaydium(conn, owner);
+        var configs = await raydium.api.getCpmmConfigs();
+        if(!configs || !configs.length) throw new Error("Raydium fee configs are unavailable right now.");
+        var feeConfig = Object.assign({}, configs[0]);
+        var programId = state.network === "mainnet" ? S.raydium.CREATE_CPMM_POOL_PROGRAM : new w3.PublicKey(DEVNET_CPMM_PROGRAM);
+        var poolFeeAccount = state.network === "mainnet" ? S.raydium.CREATE_CPMM_POOL_FEE_ACC : S.raydium.DEVNET_PROGRAM_ID.CREATE_CPMM_POOL_FEE_ACC;
+        if(state.network === "devnet"){
+          /* The devnet API can return mainnet config IDs — recompute the PDA for this index. */
+          feeConfig.id = S.raydium.getCpmmPdaAmmConfigId(programId, feeConfig.index || 0).publicKey.toBase58();
+        }
+        summaryLine(box, net.label + " · From " + truncAddr(state.wallet.pubkey) + " · Create Raydium CPMM pool " + tick + "/" + p.sym + " · Seed " + fmtTokens(parseAmtStr($("seedTokenAmt").value), 0) + " " + tick + " + " + fmtTokens(parseAmtStr($("seedPairAmt").value), 4) + " " + p.sym + " · Est. cost ~0.19 SOL");
+        statusLine(box, "The pool transaction is simulated inside the signing step — if simulation fails, your wallet is never asked to send it.", "mut");
+        var created = await raydium.cpmm.createPool({
+          programId: programId,
+          poolFeeAccount: poolFeeAccount,
+          mintA: { address: mintPk.toBase58(), programId: TOKEN22_PROG, decimals: 6 },
+          mintB: { address: p.mint, programId: p.programId, decimals: p.decimals },
+          mintAAmount: new BN(seedTokenRaw),
+          mintBAmount: new BN(seedPairRaw),
+          startTime: new BN(0),
+          feeConfig: feeConfig,
+          associatedOnly: false,
+          checkCreateATAOwner: true,
+          ownerInfo: { useSOLBalance: true },
+          txVersion: S.raydium.TxVersion.V0,
+          computeBudgetConfig: { units: 600000, microLamports: 100000 }
+        });
+        var poolId = String(created.extInfo.address.poolId);
+        var execRes = await created.execute({ sendAndConfirm: true });
+        var sig2 = execRes && execRes.txId ? execRes.txId : "";
+        state.tokenPools[mintPk.toBase58() + ":" + state.network] = poolId;
+        statusLine(box, '<span class="st-ok">Pool live:</span> ' + poolId + ' · <a href="' + explorerAddr(poolId) + '" target="_blank" rel="noopener">Solscan</a>' + (sig2 ? ' · <a href="' + explorerTx(sig2) + '" target="_blank" rel="noopener">tx</a>' : ""));
+        statusLine(box, "LP tokens were sent to your wallet and are <b>not</b> locked — locking is a separate step, and until then you can withdraw the liquidity.");
+        statusLine(box, '<span class="st-ok">Done.</span> ' + esc(name) + ' ($' + esc(tick) + ') now trades against ' + p.sym + ' on Raydium CPMM and routes through Jupiter.');
+        toast("Launched $" + tick + " — mint + pool are live on " + state.network + ".");
+        loadBalances();
+      } catch(e) {
+        statusLine(box, '<span class="st-err">Stopped: ' + esc(shortErr(e)) + '</span>');
+        toast("Deployment stopped — see the status box for details.");
+      } finally {
+        state.deploying = false;
+        btn.disabled = false;
+        updateDeployBtn();
+      }
+    }
+
+    /* ================= Swap execution ================= */
+    function devnetPoolFor(mint){ return state.tokenPools[mint + ":devnet"] || null; }
+    function executeSwap(){
+      if(state.swapping) return;
+      if(!state.wallet){ openWalletModal(); return; }
+      if(state.network === "devnet") executeDevnetSwap();
+      else executeJupiterSwap();
+    }
+    async function executeJupiterSwap(){
+      var S = stack();
+      if(!S){ toast("Solana libraries are still loading — try again in a second."); return; }
+      if(!state.quote){ toast("No live quote yet — enter an amount and wait for the quote."); return; }
+      var rawNow = parseAmtStr($("amtInput").value);
+      var amtNow = state.side === "buy" ? Math.floor(rawNow * 1e9) : Math.floor(rawNow * 1e6);
+      if(!state.quoteFor || state.quoteFor.amount !== amtNow || state.quoteFor.side !== state.side || state.quoteFor.slippage !== state.slippage){
+        toast("The amount changed — wait a moment for the fresh quote, then try again.");
+        refreshQuote();
+        return;
+      }
+      var w3 = S.web3;
+      var conn = getConnection();
+      var box = $("swapStatus");
+      var raw = parseAmtStr($("amtInput").value);
+      state.swapping = true;
+      statusBox(box, "Swap · Solana mainnet · Jupiter");
+      try {
+        var res = await fetch("https://lite-api.jup.ag/swap/v1/swap", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ quoteResponse: state.quote, userPublicKey: state.wallet.pubkey, wrapAndUnwrapSol: true, dynamicComputeUnitLimit: true })
+        }).then(function(r){ return r.json(); });
+        if(!res || !res.swapTransaction) throw new Error((res && res.error) || "Jupiter did not return a swap transaction.");
+        var tx = w3.VersionedTransaction.deserialize(b64ToBytes(res.swapTransaction));
+        var inSym = state.side === "buy" ? "SOL" : "GTA6L", outSym = state.side === "buy" ? "GTA6L" : "SOL";
+        summaryLine(box, "Mainnet · From " + truncAddr(state.wallet.pubkey) + " · Swap " + fmtTokens(raw, 4) + " " + inSym + " → " + outSym + " via Jupiter · Slippage " + (state.slippage / 100) + "%");
+        statusLine(box, "Simulating swap…", "mut");
+        await simulateTx(conn, tx);
+        statusLine(box, "Simulation OK. Confirm in your wallet…", "mut");
+        var signed = await state.wallet.provider.signTransaction(tx);
+        var sig = await conn.sendRawTransaction(signed.serialize(), { skipPreflight: false, preflightCommitment: "confirmed", maxRetries: 3 });
+        await conn.confirmTransaction({ signature: sig, blockhash: tx.message.recentBlockhash, lastValidBlockHeight: res.lastValidBlockHeight }, "confirmed");
+        statusLine(box, '<span class="st-ok">Swap confirmed.</span> <a href="' + explorerTx(sig) + '" target="_blank" rel="noopener">View on Solscan</a>');
+        toast("Swap confirmed");
+        loadBalances();
+        refreshQuote();
+      } catch(e) {
+        statusLine(box, '<span class="st-err">Stopped: ' + esc(shortErr(e)) + '</span>');
+      } finally { state.swapping = false; }
+    }
+    async function executeDevnetSwap(){
+      var poolId = devnetPoolFor(GTA6L_MINT);
+      if(!poolId){
+        toast("GTA6L belum punya pool di devnet — swap devnet nggak tersedia untuk token ini.");
+        return;
+      }
+      var S = stack();
+      if(!S){ toast("Solana libraries are still loading — try again in a second."); return; }
+      var w3 = S.web3, BN = S.BN;
+      var conn = getConnection();
+      var owner = new w3.PublicKey(state.wallet.pubkey);
+      var box = $("swapStatus");
+      var raw = parseAmtStr($("amtInput").value);
+      if(isNaN(raw) || raw <= 0){ toast("Enter an amount first."); return; }
+      state.swapping = true;
+      statusBox(box, "Swap · Solana devnet · Raydium CPMM");
+      try {
+        var raydium = await loadRaydium(conn, owner);
+        var data = await raydium.cpmm.getPoolInfoFromRpc(poolId);
+        var poolInfo = data.poolInfo, rpcData = data.rpcData;
+        var inMint = state.side === "buy" ? SOL_MINT : GTA6L_MINT;
+        var outMint = state.side === "buy" ? GTA6L_MINT : SOL_MINT;
+        var inDec = state.side === "buy" ? 9 : 6;
+        var rawIn = toRawStr(String(raw), inDec);
+        if(!rawIn || rawIn === "0") throw new Error("Invalid amount.");
+        var amountIn = new BN(rawIn);
+        var mintInfos = await S.raydium.fetchMultipleMintInfos({ connection: conn, mints: [rpcData.mintA, rpcData.mintB] });
+        var computeInfos = raydium.cpmm.toComputePoolInfos({ pools: { [poolId]: rpcData }, mintInfos: mintInfos });
+        var computed = raydium.cpmm.computeSwapAmount({ pool: computeInfos[poolId], amountIn: amountIn, outputMint: outMint, slippage: state.slippage / 10000 });
+        var inSym = state.side === "buy" ? "SOL" : "GTA6L", outSym = state.side === "buy" ? "GTA6L" : "SOL";
+        var outUi = Number(computed.amountOut.toString()) / (state.side === "buy" ? 1e6 : 1e9);
+        summaryLine(box, "Devnet · From " + truncAddr(state.wallet.pubkey) + " · Swap " + fmtTokens(raw, 4) + " " + inSym + " → ≈ " + fmtTokens(outUi, 4) + " " + outSym + " · Raydium CPMM pool " + truncAddr(poolId) + " · Slippage " + (state.slippage / 100) + "%");
+        var swapRes = await raydium.cpmm.swap({
+          poolInfo: poolInfo,
+          poolKeys: data.poolKeys,
+          baseIn: inMint === poolInfo.mintA.address,
+          inputAmount: amountIn,
+          swapResult: { sourceAmountSwapped: amountIn, destinationAmountSwapped: computed.amountOut },
+          slippage: state.slippage / 10000,
+          txVersion: S.raydium.TxVersion.V0,
+          computeBudgetConfig: { units: 600000, microLamports: 100000 }
+        });
+        var execRes = await swapRes.execute({ sendAndConfirm: true });
+        statusLine(box, '<span class="st-ok">Swap confirmed.</span> <a href="' + explorerTx(execRes.txId) + '" target="_blank" rel="noopener">View on Solscan</a>');
+        toast("Devnet swap confirmed");
+        loadBalances();
+      } catch(e) {
+        statusLine(box, '<span class="st-err">Stopped: ' + esc(shortErr(e)) + '</span>');
+      } finally { state.swapping = false; }
+    }
 
     /* ---- Create wizard init ---- */
     setFee(2);
@@ -1809,6 +2229,7 @@
     gotoStep(1);
 
     /* ================= Boot ================= */
+    syncNetworkUI();
     loadToken();
     loadTicker();
     setInterval(loadToken, 60000);
